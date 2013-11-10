@@ -253,6 +253,181 @@ namespace TuanHARogue
 
         #endregion
 
+        #region AttackASAP
+
+        private static WoWUnit UnitAttackASAP;
+
+        private static bool GetUnitAttackASAP()
+        {
+            if (!InArena && !InBattleground)
+            {
+                return false;
+            }
+
+            UnitAttackASAP = null;
+
+            //using (StyxWoW.Memory.AcquireFrame())
+            {
+                //Spirit Link Totem 53006
+                //Earthgrab Totem 60561
+                //Earthbind Totem 2630
+                //Windwalk Totem 59717
+                //Mana Tide Totem 10467
+                //Healing Tide Totem 59764 
+                //Capacitor Totem 61245 
+                UnitAttackASAP = NearbyUnFriendlyUnits.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            FacingOverride(unit) &&
+                            (unit.IsPlayer && unit.IsCasting &&
+                             (unit.CastingSpell.Id == 98322 || unit.CastingSpell.Id == 98323 ||
+                              unit.CastingSpell.Id == 98324) || //Capturing
+                             unit.Entry == 59190 || //Psyfiend
+                             unit.IsTotem &&
+                             (unit.Entry == 53006 ||
+                              unit.Entry == 60561 ||
+                              unit.Entry == 2630 ||
+                              unit.Entry == 59717 ||
+                              unit.Entry == 10467 ||
+                              unit.Entry == 59764 ||
+                              unit.Entry == 61245)) &&
+                            Attackable(unit, 30));
+
+                //UnitAttackASAP = (from unit in NearbyUnFriendlyUnits
+                //                  where unit != null &&
+                //                        unit.IsValid &&
+                //                        FacingOverride(unit) &&
+                //                        Attackable(unit, 30) &&
+                //                        //Spirit Link Totem 53006
+                //                        //Earthgrab Totem 60561
+                //                        //Earthbind Totem 2630
+                //                        //Windwalk Totem 59717
+                //                        //Mana Tide Totem 10467
+                //                        //Healing Tide Totem 59764 
+                //                        //Capacitor Totem 61245 
+                //                        (unit.IsPlayer &&
+                //                         unit.IsCasting &&
+                //                         (unit.CastingSpell.Id == 98322 || //Capturing
+                //                          unit.CastingSpell.Id == 98323 || //Capturing
+                //                          unit.CastingSpell.Id == 98324) || //Capturing
+                //                         unit.Entry == 59190 || //Psyfiend
+                //                         //unit.Entry == 65282 && Attackable(unit, 5) || //Void Tendril
+                //                         unit.IsTotem &&
+                //                         (unit.Entry == 53006 ||
+                //                          unit.Entry == 60561 ||
+                //                          unit.Entry == 2630 ||
+                //                          unit.Entry == 59717 ||
+                //                          unit.Entry == 10467 ||
+                //                          unit.Entry == 59764 ||
+                //                          unit.Entry == 61245))
+                //                  select unit).
+                //    FirstOrDefault();
+            }
+
+            //if (UnitAttackASAP == null)
+            //{
+            //    //using (StyxWoW.Memory.AcquireFrame())
+            //    {
+            //        UnitAttackASAP = (from unit in NearbyUnFriendlyUnits
+            //                          where unit!=null && unit.IsValid
+            //                          where unit.IsPet && unit.IsCasting
+            //                          where Attackable(unit, 40)
+            //                          where Me.IsFacing(unit)
+            //                          where
+            //                              //Mesmerize || Seduction
+            //                              (unit.CastingSpell.Id == 115268 ||
+            //                               unit.CastingSpell.Id == 6358)
+            //                          select unit).FirstOrDefault();
+            //    }
+            //}
+
+            return UnitAttackASAP != null;
+        }
+
+        private static Composite AttackASAP()
+        {
+            return new PrioritySelector(
+                //new Decorator(
+                //    ret =>
+                //    THSettings.Instance.AttackASAP &&
+                //    !CurrentTargetAttackable(50) &&
+                //    DebuffRoot(Me) &&
+                //    GetUnitAttackASAP() &&
+                //    UnitAttackASAP != null &&
+                //    UnitAttackASAP.IsValid &&
+                //    UnitAttackASAP.Entry == 65282,
+                //    new Action(
+                //        ret =>
+                //            {
+                //                Logging.Write("Target Void Tendril - You are rooted lol");
+                //                UnitAttackASAP.Target();
+                //                return RunStatus.Failure;
+                //            })
+                //    ),
+                new Decorator(
+                    ret =>
+                    (THSettings.Instance.AttackOOC || Me.Combat) &&
+                    THSettings.Instance.AttackASAP &&
+                    SpellManager.HasSpell("Gouge") &&
+                    !IsStealthed(Me) &&
+                    GetUnitAttackASAP() &&
+                    UnitAttackASAP != null &&
+                    UnitAttackASAP.IsValid &&
+                    UnitAttackASAP.Entry != 59190 &&
+                    UnitAttackASAP.IsWithinMeleeRange &&
+                    //UnitAttackASAP.IsCasting &&
+                    (HasGlyph.Contains("56809") || UnitAttackASAP.IsFacing(Me)) &&
+                    SpellManager.CanCast("Gouge"),
+                    new Action(
+                        ret =>
+                            {
+                                SafelyFacingTarget(UnitAttackASAP);
+                                CastSpell("Gouge", UnitAttackASAP, "Gouge: Psyfiend");
+                            })
+                    ),
+                new Decorator(
+                    ret =>
+                    (THSettings.Instance.AttackOOC || Me.Combat) &&
+                    THSettings.Instance.AttackASAP &&
+                    SpellManager.HasSpell("Fan of Knives") &&
+                    !IsStealthed(Me) &&
+                    GetUnitAttackASAP() &&
+                    UnitAttackASAP != null &&
+                    UnitAttackASAP.IsValid &&
+                    UnitAttackASAP.IsPlayer &&
+                    DistanceCheck(UnitAttackASAP) <= 10 &&
+                    SpellManager.CanCast("Fan of Knives"),
+                    new Action(
+                        ret =>
+                            {
+                                SafelyFacingTarget(UnitAttackASAP);
+                                CastSpell("Fan of Knives", Me, "Fan of Knives: Flag Capper");
+                            })
+                    ),
+                new Decorator(
+                    ret =>
+                    (THSettings.Instance.AttackOOC || Me.Combat) &&
+                    THSettings.Instance.AttackASAP &&
+                    SpellManager.HasSpell("Throw") &&
+                    !IsStealthed(Me) &&
+                    !CurrentTargetAttackable(5) &&
+                    GetUnitAttackASAP() &&
+                    UnitAttackASAP != null &&
+                    UnitAttackASAP.IsValid &&
+                    UnitAttackASAP.IsTotem &&
+                    SpellManager.CanCast("Throw"),
+                    new Action(
+                        ret =>
+                            {
+                                SafelyFacingTarget(UnitAttackASAP);
+                                CastSpell("Throw", UnitAttackASAP, "Throw: Flag Capper or Totem");
+                            })
+                    )
+                )
+                ;
+        }
+
+        #endregion
+
         #region Backstab
 
         private static Composite Backstab()
@@ -398,11 +573,10 @@ namespace TuanHARogue
                     PlayerEnergy >= THSettings.Instance.BurstofSpeedEnergyNumber &&
                     //!Me.HasAura("Burst of Speed") &&
                     MyAuraTimeLeft("Burst of Speed", Me) <= THSettings.Instance.BurstofSpeedRenew &&
-                    (Me.CurrentTarget == null ||
-                     Me.CurrentTarget != null &&
-                     (Me.CurrentTarget.IsMoving &&
-                      !Me.CurrentTarget.IsWithinMeleeRange ||
-                      DistanceCheck(Me.CurrentTarget) >= THSettings.Instance.BurstofSpeedDistance)) &&
+                    //(Me.CurrentTarget == null ||
+                    //CurrentTargetAttackable(10) ||
+                    // CurrentTargetAttackable(40) &&
+                    // !Me.CurrentTarget.IsWithinMeleeRange) &&
                     SpellManager.CanCast("Burst of Speed"),
                     new Action(delegate
                         {
@@ -864,11 +1038,124 @@ namespace TuanHARogue
 
         #endregion
 
+        #region CheapShotInterrupt
+
+        private static bool GetUnitInterruptCheapShot()
+        {
+            UnitInterrupt = null;
+
+            //using (StyxWoW.Memory.AcquireFrame())
+            {
+                if (InBattleground || InArena)
+                {
+                    UnitInterrupt = NearbyUnFriendlyPlayers.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                (THSettings.Instance.InterruptAll ||
+                                 THSettings.Instance.InterruptTarget &&
+                                 Me.CurrentTarget != null &&
+                                 unit == Me.CurrentTarget ||
+                                 THSettings.Instance.InterruptFocus &&
+                                 Me.FocusedUnit != null &&
+                                 unit == Me.FocusedUnit) &&
+                                unit.IsWithinMeleeRange &&
+                                FacingOverride(unit) &&
+                                ControlStunLevelGet(UnitInterrupt) < 3 &&
+                                InterruptCheck(unit, THSettings.Instance.CheapShotInterruptTimeLeft) &&
+                                Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyPlayers
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       (THSettings.Instance.InterruptAll ||
+                    //                        THSettings.Instance.InterruptTarget &&
+                    //                        Me.CurrentTarget != null &&
+                    //                        unit == Me.CurrentTarget ||
+                    //                        THSettings.Instance.InterruptFocus &&
+                    //                        Me.FocusedUnit != null &&
+                    //                        unit == Me.FocusedUnit) &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       FacingOverride(unit) &&
+                    //                       ControlStunLevelGet(UnitInterrupt) < 3 &&
+                    //                       InterruptCheck(unit, THSettings.Instance.CheapShotInterruptTimeLeft, true) &&
+                    //                       Attackable(unit, 5)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+                    //PvE Search
+                else if (!Me.IsInInstance || InDungeon || InRaid)
+                {
+                    UnitInterrupt = NearbyUnFriendlyUnits.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                unit.Combat &&
+                                FacingOverride(unit) &&
+                                ControlStunLevelGet(UnitInterrupt) < 3 &&
+                                unit.IsWithinMeleeRange &&
+                                InterruptCheck(unit,
+                                               THSettings.Instance.CheapShotInterruptTimeLeft) &&
+                                Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyUnits
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       //where !unit.IsBoss
+                    //                       unit.Combat &&
+                    //                       FacingOverride(unit) &&
+                    //                       ControlStunLevelGet(UnitInterrupt) < 3 &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       InterruptCheck(unit,
+                    //                                      THSettings.Instance.CheapShotInterruptTimeLeft, true) &&
+                    //                       Attackable(unit, 40)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+            }
+
+            return UnitInterrupt != null;
+        }
+
+        private static void CheapShotInterruptVoid()
+        {
+            if ((THSettings.Instance.AttackOOC || Me.Combat) &&
+                THSettings.Instance.CheapShotInterrupt &&
+                LastInterrupt + TimeSpan.FromMilliseconds(1000) < DateTime.Now &&
+                SpellManager.HasSpell("Cheap Shot") &&
+                !MeMounted &&
+                IsStealthed(Me) &&
+                GetUnitInterruptCheapShot() &&
+                UnitInterrupt != null &&
+                UnitInterrupt.IsValid &&
+                SpellManager.CanCast("Cheap Shot"))
+            {
+                //Logging.Write(LogLevel.Diagnostic, "Current ControlStun DR Level {0}",
+                //              ControlStunLevelGet(UnitInterrupt));
+
+                SafelyFacingTarget(UnitInterrupt);
+                CastSpell("Cheap Shot", UnitInterrupt, "CheapShotInterrupgt", true);
+                LastInterrupt = DateTime.Now;
+            }
+        }
+
+        #endregion
+
         #region CloakofShadows
 
         private static Composite CloakofShadows()
         {
             return new PrioritySelector(
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.CloakofShadowsRoot &&
+                    SpellManager.HasSpell("Cloak of Shadows") &&
+                    !MeMounted &&
+                    !Me.HasAura("Cloak of Shadows") &&
+                    CurrentTargetAttackable(30) &&
+                    DebuffRootCanCloak(Me) &&
+                    SpellManager.CanCast("Cloak of Shadows"),
+                    new Action(delegate
+                        {
+                            CastSpell("Cloak of Shadows", Me, "CloakofShadowsRoot");
+                            return RunStatus.Failure;
+                        })),
                 new Decorator(
                     ret =>
                     THSettings.Instance.CloakofShadows &&
@@ -1050,6 +1337,326 @@ namespace TuanHARogue
                         {
                             SafelyFacingTarget(Me.CurrentTarget);
                             CastSpell("Deadly Throw", Me.CurrentTarget, "DeadlyThrowSlow");
+                        }))
+                );
+        }
+
+        #endregion
+
+        #region DeadlyThrowInterrupt
+
+        private static bool GetUnitInterruptDeadlyThrow()
+        {
+            UnitInterrupt = null;
+
+            //using (StyxWoW.Memory.AcquireFrame())
+            {
+                if (InBattleground || InArena)
+                {
+                    UnitInterrupt = NearbyUnFriendlyPlayers.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                (THSettings.Instance.InterruptAll ||
+                                 THSettings.Instance.InterruptTarget &&
+                                 Me.CurrentTarget != null &&
+                                 unit == Me.CurrentTarget ||
+                                 THSettings.Instance.InterruptFocus &&
+                                 Me.FocusedUnit != null &&
+                                 unit == Me.FocusedUnit) &&
+                                FacingOverride(unit) &&
+                                !unit.IsWithinMeleeRange &&
+                                InterruptCheck(unit, THSettings.Instance.DeadlyThrowInterruptTimeLeft, false) &&
+                                Attackable(unit, 30));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyPlayers
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       (THSettings.Instance.InterruptAll ||
+                    //                        THSettings.Instance.InterruptTarget &&
+                    //                        Me.CurrentTarget != null &&
+                    //                        unit == Me.CurrentTarget ||
+                    //                        THSettings.Instance.InterruptFocus &&
+                    //                        Me.FocusedUnit != null &&
+                    //                        unit == Me.FocusedUnit) &&
+                    //                       FacingOverride(unit) &&
+                    //                       !unit.IsWithinMeleeRange &&
+                    //                       InterruptCheck(unit, THSettings.Instance.DeadlyThrowInterruptTimeLeft, false) &&
+                    //                       Attackable(unit, 30)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+                    //PvE Search
+                else if (!Me.IsInInstance || InDungeon || InRaid)
+                {
+                    UnitInterrupt = NearbyUnFriendlyUnits.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                unit.Combat &&
+                                FacingOverride(unit) &&
+                                !unit.IsWithinMeleeRange &&
+                                InterruptCheck(unit,
+                                               THSettings.Instance.DeadlyThrowInterruptTimeLeft, false) &&
+                                Attackable(unit, 30));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyUnits
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       //where !unit.IsBoss
+                    //                       unit.Combat &&
+                    //                       FacingOverride(unit) &&
+                    //                       !unit.IsWithinMeleeRange &&
+                    //                       InterruptCheck(unit,
+                    //                                      THSettings.Instance.DeadlyThrowInterruptTimeLeft, false) &&
+                    //                       Attackable(unit, 30)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+            }
+
+            return UnitInterrupt != null;
+        }
+
+        private static void DeadlyThrowVoid()
+        {
+            if ((THSettings.Instance.AttackOOC || Me.Combat) &&
+                THSettings.Instance.DeadlyThrowInterrupt &&
+                LastInterrupt + TimeSpan.FromMilliseconds(1000) < DateTime.Now &&
+                SpellManager.HasSpell("Deadly Throw") &&
+                !MeMounted &&
+                Math.Abs(PlayerComboPoint - 3) < 1 &&
+                GetUnitInterruptDeadlyThrow() &&
+                UnitInterrupt != null &&
+                UnitInterrupt.IsValid &&
+                SpellManager.CanCast("DeadlyThrow"))
+            {
+                SafelyFacingTarget(UnitInterrupt);
+                CastSpell("DeadlyThrow", UnitInterrupt, "DeadlyThrow Interrupt");
+                LastInterrupt = DateTime.Now;
+            }
+        }
+
+        #endregion
+
+        #region DisarmTrap
+
+        private static WoWObject EnemyTrap;
+
+        private static bool GetEnemyTrap()
+        {
+            //Snake Trap 183957
+            //Freeezing Trap 2561
+            //Explosive Trap 164839
+            //Ice Trap 164639
+
+            EnemyTrap = null;
+
+            EnemyTrap =
+                ObjectManager.GetObjectsOfTypeFast<WoWObject>()
+                             .FirstOrDefault(
+                                 p =>
+                                 p.Distance <= 20 &&
+                                 (p.Entry == 183957 ||
+                                  p.Entry == 2561 ||
+                                  p.Entry == 164839 ||
+                                  p.Entry == 164639) &&
+                                 Me.IsFacing(p));
+
+            //if (EnemyTrap != null)
+            //{
+            //    Logging.Write("Found Trap " + EnemyTrap.Name);
+            //}
+
+            return EnemyTrap != null;
+        }
+
+        private static Composite DisarmTrap()
+        {
+            return new Decorator(
+                ret =>
+                THSettings.Instance.DisarmTrap &&
+                (InArena || InBattleground) &&
+                SpellManager.HasSpell("Disarm Trap") &&
+                !CurrentTargetAttackable(10) &&
+                IsStealthedNoSD(Me) &&
+                !Me.IsMoving &&
+                GetEnemyTrap() &&
+                EnemyTrap != null &&
+                EnemyTrap.IsValid,
+                new Action(
+                    ret =>
+                        {
+                            Logging.Write(LogLevel.Diagnostic, "Trying Disarm Trap " + EnemyTrap.Name);
+                            Me.SetFacing(EnemyTrap.Location);
+                            EnemyTrap.Interact();
+                            return RunStatus.Failure;
+                        })
+                );
+        }
+
+        #endregion
+
+        #region Dismantle
+
+        private static WoWUnit UnitDismantle;
+
+        private static bool GetUnitDismantleCooddown()
+        {
+            UnitDismantle = null;
+
+            //Logging.Write("UnitDismantle: Search");
+
+            if (InBattleground || InArena)
+            {
+                UnitDismantle = NearbyUnFriendlyPlayers.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            FacingOverride(unit) &&
+                            TalentSort(unit) <= 2 &&
+                            !DebuffDisarm(unit) &&
+                            !DebuffCC(unit) &&
+                            BuffBurst(unit) &&
+                            SafeUsingCooldown(unit) &&
+                            Attackable(unit, 5));
+
+                //UnitDismantle = (from unit in NearbyUnFriendlyPlayers
+                //                 where unit != null &&
+                //                       unit.IsValid &&
+                //                       FacingOverride(unit) &&
+                //                       TalentSort(unit) <= 2 &&
+                //                       !DebuffDisarm(unit) &&
+                //                       !DebuffCC(unit) &&
+                //                       BuffBurst(unit) &&
+                //                       SafeUsingCooldown(unit) &&
+                //                       Attackable(unit, 5)
+                //                 select unit).FirstOrDefault();
+            }
+
+            return UnitDismantle != null;
+        }
+
+        private static bool GetUnitDismantle()
+        {
+            UnitDismantle = null;
+
+            //Logging.Write("UnitDismantle: Search");
+
+            if (InBattleground || InArena)
+            {
+                UnitDismantle = NearbyUnFriendlyPlayers.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            FacingOverride(unit) &&
+                            TalentSort(unit) <= 2 &&
+                            !DebuffDisarm(unit) &&
+                            !DebuffCC(unit) &&
+                            SafeUsingCooldown(unit) &&
+                            Attackable(unit, 5));
+
+                //UnitDismantle = (from unit in NearbyUnFriendlyPlayers
+                //                 where unit != null &&
+                //                       unit.IsValid &&
+                //                       FacingOverride(unit) &&
+                //                       TalentSort(unit) <= 2 &&
+                //                       !DebuffDisarm(unit) &&
+                //                       !DebuffCC(unit) &&
+                //                       SafeUsingCooldown(unit) &&
+                //                       Attackable(unit, 5)
+                //                 orderby unit.CurrentHealth descending
+                //                 select unit).FirstOrDefault();
+            }
+            else
+            {
+                UnitDismantle = NearbyUnFriendlyUnits.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            FacingOverride(unit) &&
+                            !unit.IsBoss &&
+                            (unit.IsHumanoid ||
+                             unit.IsDragon) &&
+                            WorthyTarget(unit, 0.75) &&
+                            unit.Combat &&
+                            !DebuffDisarm(unit) &&
+                            (unit.CurrentTarget != null && unit.CurrentTarget == Me ||
+                             unit.IsTargetingMyPartyMember ||
+                             unit.IsTargetingMyRaidMember ||
+                             unit.IsTargetingMeOrPet) &&
+                            Attackable(unit, 5));
+
+                //UnitDismantle = (from unit in NearbyUnFriendlyUnits
+                //                 where unit != null &&
+                //                       unit.IsValid &&
+                //                       FacingOverride(unit) &&
+                //                       !unit.IsBoss &&
+                //                       (unit.IsHumanoid ||
+                //                        unit.IsDragon) &&
+                //                       WorthyTarget(unit, 0.75) &&
+                //                       unit.Combat &&
+                //                       !DebuffDisarm(unit) &&
+                //                       (unit.CurrentTarget != null && unit.CurrentTarget == Me ||
+                //                        unit.IsTargetingMyPartyMember ||
+                //                        unit.IsTargetingMyRaidMember ||
+                //                        unit.IsTargetingMeOrPet) &&
+                //                       Attackable(unit, 5)
+                //                 orderby unit.CurrentHealth descending
+                //                 select unit).FirstOrDefault();
+            }
+
+            //if (UnitDismantle != null)
+            //{
+            //    Logging.Write("UnitDismantle: " + UnitDismantle.Name +
+            //                  " Dist: " + UnitDismantle.Distance +
+            //                  " CombatReach: " + UnitDismantle.CombatReach);
+            //}
+
+            return UnitDismantle != null;
+        }
+
+        private static DateTime DismantleLast;
+
+        private static Composite Dismantle()
+        {
+            return new PrioritySelector(
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.DistmantleCooldown &&
+                    SpellManager.HasSpell("Dismantle") &&
+                    !MeMounted &&
+                    Me.Combat &&
+                    GetUnitDismantleCooddown() &&
+                    SpellManager.CanCast("Dismantle"),
+                    new Action(delegate
+                        {
+                            SafelyFacingTarget(UnitDismantle);
+                            DismantleLast = DateTime.Now;
+                            CastSpell("Dismantle", UnitDismantle, "DistmantleCooldown");
+                        })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.Dismantle &&
+                    SpellManager.HasSpell("Dismantle") &&
+                    DismantleLast + TimeSpan.FromMilliseconds(10000) < DateTime.Now &&
+                    !MeMounted &&
+                    Me.Combat &&
+                    Me.HealthPercent <= THSettings.Instance.DismantleHP &&
+                    !IsStealthed(Me) &&
+                    GetUnitDismantle() &&
+                    SpellManager.CanCast("Dismantle"),
+                    new Action(delegate
+                        {
+                            SafelyFacingTarget(UnitDismantle);
+                            DismantleLast = DateTime.Now;
+                            CastSpell("Dismantle", UnitDismantle, "DismantleHP");
+                        })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.DismantleTarget &&
+                    SpellManager.HasSpell("Dismantle") &&
+                    DismantleLast + TimeSpan.FromMilliseconds(10000) < DateTime.Now &&
+                    !MeMounted &&
+                    Me.Combat &&
+                    CountDPSTarget(Me) >= THSettings.Instance.DismantleTargetUnit &&
+                    GetUnitDismantle() &&
+                    SpellManager.CanCast("Dismantle"),
+                    new Action(delegate
+                        {
+                            SafelyFacingTarget(UnitDismantle);
+                            DismantleLast = DateTime.Now;
+                            CastSpell("Dismantle", UnitDismantle, "DismantleTargetUnit");
                         }))
                 );
         }
@@ -1342,6 +1949,46 @@ namespace TuanHARogue
 
         #endregion
 
+        #region ExposeArmor
+
+        private static Composite ExposeArmor()
+        {
+            return new Decorator(
+                ret =>
+                (THSettings.Instance.AttackOOC || Me.Combat) &&
+                THSettings.Instance.ExposeArmor &&
+                BurstCooldownEnergyPool < DateTime.Now &&
+                SpellManager.HasSpell("Expose Armor") &&
+                !MeMounted &&
+                PlayerComboPoint < MaxComboPoint &&
+                CurrentTargetAttackable(5) &&
+                !Me.CurrentTarget.HasAura(91021) && //Find Weakness
+                (Me.CurrentTarget.Class == WoWClass.DeathKnight ||
+                 Me.CurrentTarget.Class == WoWClass.Paladin ||
+                 Me.CurrentTarget.Class == WoWClass.Warrior) &&
+                PoolEnergyPassCheck() &&
+                FacingOverrideMeCurrentTarget &&
+                (!IsStealthed(Me) ||
+                 Me.Combat &&
+                 IsStealthed(Me) &&
+                 PlayerEnergy > 90) &&
+                (!Me.CurrentTarget.HasAura(113746) ||
+                 Me.CurrentTarget.HasAura(113746) &&
+                 Me.CurrentTarget.GetAuraById(113746).StackCount < 3 ||
+                 Me.CurrentTarget.HasAura(113746) &&
+                 Me.CurrentTarget.GetAuraById(113746).TimeLeft.TotalMilliseconds < 7000) &&
+                SpellManager.CanCast("Expose Armor"),
+                new Action(delegate
+                    {
+                        SafelyFacingTarget(Me.CurrentTarget);
+                        CastSpell("Expose Armor", Me.CurrentTarget, "ExposeArmor");
+                    })
+                )
+                ;
+        }
+
+        #endregion
+
         #region FanofKnives
 
         private static Composite FanofKnives()
@@ -1571,6 +2218,278 @@ namespace TuanHARogue
 
         #endregion
 
+        #region GougeInterrupt
+
+        private static bool GetUnitInterruptGouge()
+        {
+            UnitInterrupt = null;
+
+            //using (StyxWoW.Memory.AcquireFrame())
+            {
+                if (InBattleground || InArena)
+                {
+                    UnitInterrupt = NearbyUnFriendlyPlayers.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                (THSettings.Instance.InterruptAll ||
+                                 THSettings.Instance.InterruptTarget &&
+                                 Me.CurrentTarget != null &&
+                                 unit == Me.CurrentTarget ||
+                                 THSettings.Instance.InterruptFocus &&
+                                 Me.FocusedUnit != null &&
+                                 unit == Me.FocusedUnit) &&
+                                unit.IsWithinMeleeRange &&
+                                FacingOverride(unit) &&
+                                (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+                                DisorientsLevelGet(Me.CurrentTarget) < 3 &&
+                                InterruptCheck(unit, THSettings.Instance.GougeTimeLeft, true) &&
+                                Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyPlayers
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       (THSettings.Instance.InterruptAll ||
+                    //                        THSettings.Instance.InterruptTarget &&
+                    //                        Me.CurrentTarget != null &&
+                    //                        unit == Me.CurrentTarget ||
+                    //                        THSettings.Instance.InterruptFocus &&
+                    //                        Me.FocusedUnit != null &&
+                    //                        unit == Me.FocusedUnit) &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       FacingOverride(unit) &&
+                    //                       (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+                    //                       DisorientsLevelGet(Me.CurrentTarget) < 3 &&
+                    //                       InterruptCheck(unit, THSettings.Instance.GougeTimeLeft, true) &&
+                    //                       Attackable(unit, 5)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+                    //PvE Search
+                else if (!Me.IsInInstance || InDungeon || InRaid)
+                {
+                    UnitInterrupt = NearbyUnFriendlyUnits.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                unit.Combat &&
+                                FacingOverride(unit) &&
+                                (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+                                unit.IsWithinMeleeRange &&
+                                InterruptCheck(unit,
+                                               THSettings.Instance.GougeTimeLeft, true) &&
+                                Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyUnits
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       //where !unit.IsBoss
+                    //                       unit.Combat &&
+                    //                       FacingOverride(unit) &&
+                    //                       (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       InterruptCheck(unit,
+                    //                                      THSettings.Instance.GougeTimeLeft, true) &&
+                    //                       Attackable(unit, 40)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+            }
+
+            return UnitInterrupt != null;
+        }
+
+        private static void GougeVoid()
+        {
+            if ((THSettings.Instance.AttackOOC || Me.Combat) &&
+                THSettings.Instance.Gouge &&
+                LastInterrupt + TimeSpan.FromMilliseconds(1000) < DateTime.Now &&
+                SpellManager.HasSpell("Gouge") &&
+                !MeMounted &&
+                GetUnitInterruptGouge() &&
+                UnitInterrupt != null &&
+                UnitInterrupt.IsValid &&
+                SpellManager.CanCast("Gouge"))
+            {
+                SafelyFacingTarget(UnitInterrupt);
+                CastSpell("Gouge", UnitInterrupt, "Gouge", true);
+                LastInterrupt = DateTime.Now;
+            }
+        }
+
+        #endregion
+
+        #region Gouge
+
+        private static WoWUnit UnitGougePet;
+
+        private static bool GetUnitGougePet()
+        {
+            UnitGougePet = null;
+
+            UnitGougePet = NearbyUnFriendlyUnits.FirstOrDefault(
+                unit => unit != null && unit.IsValid &&
+                        unit.IsPet &&
+                        unit.IsWithinMeleeRange &&
+                        unit.CreatedByUnit == Me.CurrentTarget &&
+                        FacingOverride(unit) &&
+                        (HasGlyph.Contains("56809") || unit.IsFacing(Me)));
+
+            //UnitGougePet = (from unit in NearbyUnFriendlyUnits
+            //                where unit != null &&
+            //                      unit.IsValid &&
+            //                      unit.IsPet &&
+            //                      unit.IsWithinMeleeRange &&
+            //                      unit.CreatedByUnit == Me.CurrentTarget &&
+            //                      FacingOverride(unit) &&
+            //                      (HasGlyph.Contains("56809") || unit.IsFacing(Me))
+            //                select unit).FirstOrDefault();
+
+            return UnitGougePet != null;
+        }
+
+        private static WoWUnit UnitGougeCooldown;
+
+        private static bool GetUnitGougeCooldownCooddown()
+        {
+            UnitGougeCooldown = null;
+
+            //Logging.Write("UnitGougeCooldown: Search");
+
+            if (InBattleground || InArena)
+            {
+                UnitGougeCooldown = NearbyUnFriendlyPlayers.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            FacingOverride(unit) &&
+                            (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+                            (unit.CurrentTarget == null ||
+                             unit.CurrentTarget != null &&
+                             unit.CurrentTarget != Me ||
+                             unit.CurrentTarget == null &&
+                             unit.CurrentTarget == Me &&
+                             unit.CurrentHealth > Me.CurrentHealth) &&
+                            TalentSort(unit) <= 3 &&
+                            BuffBurst(unit) &&
+                            Attackable(unit, 5));
+
+                //UnitGougeCooldown = (from unit in NearbyUnFriendlyPlayers
+                //                     where unit != null &&
+                //                           unit.IsValid &&
+                //                           FacingOverride(unit) &&
+                //                           (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+                //                           (unit.CurrentTarget == null ||
+                //                            unit.CurrentTarget != null &&
+                //                            unit.CurrentTarget != Me ||
+                //                            unit.CurrentTarget == null &&
+                //                            unit.CurrentTarget == Me &&
+                //                            unit.CurrentHealth > Me.CurrentHealth) &&
+                //                           TalentSort(unit) <= 3 &&
+                //                           BuffBurst(unit) &&
+                //                           Attackable(unit, 5)
+                //                     select unit).FirstOrDefault();
+            }
+
+            return UnitGougeCooldown != null;
+        }
+
+        private static WoWUnit UnitGougeHelpFriend;
+
+        private static bool GeUnitGougeHelpFriend()
+        {
+            UnitGougeHelpFriend = null;
+
+            UnitGougeHelpFriend = NearbyUnFriendlyPlayers.FirstOrDefault(
+                unit => unit != null && unit.IsValid &&
+                        unit.IsWithinMeleeRange &&
+                        FacingOverride(unit) &&
+                        (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+                        unit.CurrentTarget != null &&
+                        RaidPartyMembers.Contains(unit.CurrentTarget) &&
+                        unit.CurrentTarget.HealthPercent <= THSettings.Instance.GougeHelpFriendHP &&
+                        !DebuffDisarm(unit) &&
+                        !DebuffCC(unit) &&
+                        Attackable(unit, 5));
+
+            //UnitGougeHelpFriend = (from unit in NearbyUnFriendlyPlayers
+            //                       where unit != null &&
+            //                             unit.IsValid &&
+            //                             unit.IsWithinMeleeRange &&
+            //                             FacingOverride(unit) &&
+            //                             (HasGlyph.Contains("56809") || unit.IsFacing(Me)) &&
+            //                             unit.CurrentTarget != null &&
+            //                             RaidPartyMembers.Contains(unit.CurrentTarget) &&
+            //                             unit.CurrentTarget.HealthPercent <= THSettings.Instance.GougeHelpFriendHP &&
+            //                             !DebuffDisarm(unit) &&
+            //                             !DebuffCC(unit) &&
+            //                             Attackable(unit, 5)
+            //                       orderby unit.CurrentHealth descending
+            //                       select unit).FirstOrDefault();
+
+            return UnitGougeHelpFriend != null;
+        }
+
+        private static Composite GougeHelpFriend()
+        {
+            return new PrioritySelector(
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.GougeHelpFriend &&
+                    SpellManager.HasSpell("Gouge") &&
+                    !IsStealthed(Me) &&
+                    Me.Combat &&
+                    GeUnitGougeHelpFriend() &&
+                    UnitGougeHelpFriend != null &&
+                    UnitGougeHelpFriend.IsValid &&
+                    //FacingOverride(UnitGougePet) &&
+                    SpellManager.CanCast("Gouge"),
+                    new Action(
+                        ret =>
+                            {
+                                SafelyFacingTarget(UnitGougeHelpFriend);
+                                CastSpell("Gouge", UnitGougePet, "GougeHelpFriend");
+                            })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.GougeOffensiveCooldown &&
+                    SpellManager.HasSpell("Gouge") &&
+                    !IsStealthed(Me) &&
+                    Me.Combat &&
+                    GetUnitGougeCooldownCooddown() &&
+                    UnitGougeCooldown != null &&
+                    UnitGougeCooldown.IsValid &&
+                    //FacingOverride(UnitGougePet) &&
+                    SpellManager.CanCast("Gouge"),
+                    new Action(
+                        ret =>
+                            {
+                                SafelyFacingTarget(UnitGougeCooldown);
+                                CastSpell("Gouge", UnitGougeCooldown, "GougeOffensiveCooldown");
+                            })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.GougePet &&
+                    SpellManager.HasSpell("Gouge") &&
+                    !IsStealthed(Me) &&
+                    Me.Combat &&
+                    CurrentTargetAttackable(40) &&
+                    PlayerComboPoint < MaxComboPoint &&
+                    (Me.CurrentTarget.Class == WoWClass.DeathKnight ||
+                     Me.CurrentTarget.Class == WoWClass.Hunter ||
+                     Me.CurrentTarget.Class == WoWClass.Mage ||
+                     Me.CurrentTarget.Class == WoWClass.Priest ||
+                     Me.CurrentTarget.Class == WoWClass.Shaman) &&
+                    GetUnitGougePet() &&
+                    UnitGougePet != null &&
+                    UnitGougePet.IsValid &&
+                    //FacingOverride(UnitGougePet) &&
+                    SpellManager.CanCast("Gouge"),
+                    new Action(
+                        ret =>
+                            {
+                                SafelyFacingTarget(UnitGougePet);
+                                CastSpell("Gouge", UnitGougePet, "GougePet");
+                            }))
+                );
+        }
+
+        #endregion
+
         #region Hemorrhage
 
         private static DateTime HemorrhageDebuffLast;
@@ -1770,6 +2689,102 @@ namespace TuanHARogue
 
         #endregion
 
+        #region KidneyShotInterrupt
+
+        private static bool GetUnitInterruptKidney()
+        {
+            UnitInterrupt = null;
+
+            //using (StyxWoW.Memory.AcquireFrame())
+            {
+                if (InBattleground || InArena)
+                {
+                    UnitInterrupt = NearbyUnFriendlyPlayers.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                (THSettings.Instance.InterruptAll ||
+                                 THSettings.Instance.InterruptTarget &&
+                                 Me.CurrentTarget != null &&
+                                 unit == Me.CurrentTarget ||
+                                 THSettings.Instance.InterruptFocus &&
+                                 Me.FocusedUnit != null &&
+                                 unit == Me.FocusedUnit) &&
+                                unit.IsWithinMeleeRange &&
+                                FacingOverride(unit) &&
+                                InterruptCheck(unit, THSettings.Instance.KidneyShotInterruptTimeLeft, true) &&
+                                Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyPlayers
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       (THSettings.Instance.InterruptAll ||
+                    //                        THSettings.Instance.InterruptTarget &&
+                    //                        Me.CurrentTarget != null &&
+                    //                        unit == Me.CurrentTarget ||
+                    //                        THSettings.Instance.InterruptFocus &&
+                    //                        Me.FocusedUnit != null &&
+                    //                        unit == Me.FocusedUnit) &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       FacingOverride(unit) &&
+                    //                       InterruptCheck(unit, THSettings.Instance.KidneyShotInterruptTimeLeft, true) &&
+                    //                       Attackable(unit, 5)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+                    //PvE Search
+                else if (!Me.IsInInstance || InDungeon || InRaid)
+                {
+                    UnitInterrupt = NearbyUnFriendlyUnits.FirstOrDefault(
+                        unit => unit != null && unit.IsValid &&
+                                unit.Combat &&
+                                FacingOverride(unit) &&
+                                unit.IsWithinMeleeRange &&
+                                InterruptCheck(unit,
+                                               THSettings.Instance.KidneyShotInterruptTimeLeft, true) &&
+                                Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyUnits
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       //where !unit.IsBoss
+                    //                       unit.Combat &&
+                    //                       FacingOverride(unit) &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       InterruptCheck(unit,
+                    //                                      THSettings.Instance.KidneyShotInterruptTimeLeft, true) &&
+                    //                       Attackable(unit, 40)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
+                }
+            }
+
+            return UnitInterrupt != null;
+        }
+
+        private static void KidneyShotInterruptVoid()
+        {
+            if ((THSettings.Instance.AttackOOC || Me.Combat) &&
+                THSettings.Instance.KidneyShotInterrupt &&
+                LastInterrupt + TimeSpan.FromMilliseconds(1000) < DateTime.Now &&
+                SpellManager.HasSpell("Kidney Shot") &&
+                !MeMounted &&
+                PlayerComboPoint > 0 &&
+                GetUnitInterruptKidney() &&
+                UnitInterrupt != null &&
+                UnitInterrupt.IsValid &&
+                ControlStunLevelGet(Me.CurrentTarget) < 3 &&
+                SpellManager.CanCast("Kidney Shot"))
+            {
+                //Logging.Write(LogLevel.Diagnostic, "Current ControlStun DR Level {0}",
+                //              ControlStunLevelGet(UnitInterrupt));
+
+                SafelyFacingTarget(UnitInterrupt);
+                CastSpell("Kidney Shot", UnitInterrupt, "KidneyShotInterrupt", true);
+                LastInterrupt = DateTime.Now;
+            }
+        }
+
+        #endregion
+
         #region Kick
 
         private static DateTime LastInterrupt = DateTime.Now;
@@ -1785,28 +2800,59 @@ namespace TuanHARogue
                 {
                     UnitInterrupt = NearbyUnFriendlyPlayers.FirstOrDefault(
                         unit => unit != null && unit.IsValid &&
-                                THSettings.Instance.InterruptTarget &&
-                                Me.CurrentTarget != null &&
-                                unit == Me.CurrentTarget &&
+                                (THSettings.Instance.InterruptAll ||
+                                 THSettings.Instance.InterruptTarget &&
+                                 Me.CurrentTarget != null &&
+                                 unit == Me.CurrentTarget ||
+                                 THSettings.Instance.InterruptFocus &&
+                                 Me.FocusedUnit != null &&
+                                 unit == Me.FocusedUnit) &&
                                 unit.IsWithinMeleeRange &&
                                 FacingOverride(unit) &&
                                 InterruptCheck(unit, THSettings.Instance.KickTimeLeft + 1000, false) &&
                                 Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyPlayers
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       (THSettings.Instance.InterruptAll ||
+                    //                        THSettings.Instance.InterruptTarget &&
+                    //                        Me.CurrentTarget != null &&
+                    //                        unit == Me.CurrentTarget ||
+                    //                        THSettings.Instance.InterruptFocus &&
+                    //                        Me.FocusedUnit != null &&
+                    //                        unit == Me.FocusedUnit) &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       FacingOverride(unit) &&
+                    //                       InterruptCheck(unit, THSettings.Instance.KickTimeLeft + 1000, false) &&
+                    //                       Attackable(unit, 5)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
                 }
                     //PvE Search
                 else if (!Me.IsInInstance || InDungeon || InRaid)
                 {
                     UnitInterrupt = NearbyUnFriendlyUnits.FirstOrDefault(
                         unit => unit != null && unit.IsValid &&
-                                THSettings.Instance.InterruptTarget &&
-                                Me.CurrentTarget != null &&
-                                unit == Me.CurrentTarget &&
                                 unit.Combat &&
                                 FacingOverride(unit) &&
                                 unit.IsWithinMeleeRange &&
                                 InterruptCheck(unit,
                                                THSettings.Instance.KickTimeLeft + 1000, false) &&
                                 Attackable(unit, 5));
+
+                    //UnitInterrupt = (from unit in NearbyUnFriendlyUnits
+                    //                 where unit != null &&
+                    //                       unit.IsValid &&
+                    //                       //where !unit.IsBoss
+                    //                       unit.Combat &&
+                    //                       FacingOverride(unit) &&
+                    //                       unit.IsWithinMeleeRange &&
+                    //                       InterruptCheck(unit,
+                    //                                      THSettings.Instance.KickTimeLeft + 1000, false) &&
+                    //                       Attackable(unit, 40)
+                    //                 orderby unit.CurrentCastTimeLeft ascending
+                    //                 select unit).FirstOrDefault();
                 }
             }
 
@@ -2782,6 +3828,281 @@ namespace TuanHARogue
 
         #endregion
 
+        #region Sap
+
+        private static WoWUnit UnitSapNoCombat;
+
+        private static bool GetUnitSapNoCombat()
+        {
+            UnitSapNoCombat = null;
+
+            UnitSapNoCombat = NearbyUnFriendlyPlayers.FirstOrDefault(
+                unit => unit != null && unit.IsValid &&
+                        DistanceCheck(unit) <= 15 &&
+                        FacingOverride(unit) &&
+                        !unit.Combat &&
+                        DisorientsLevelGet(unit) < THSettings.Instance.SapLevel &&
+                        MyAuraTimeLeft(6770, unit) < 500 &&
+                        !DebuffCCDuration(unit, 500) &&
+                        !Invulnerable(unit) &&
+                        unit.InLineOfSpellSight);
+
+            //UnitSapNoCombat = (from unit in NearbyUnFriendlyPlayers
+            //                   where unit != null &&
+            //                         unit.IsValid &&
+            //                         DistanceCheck(unit) <= 15 &&
+            //                         FacingOverride(unit) &&
+            //                         !unit.Combat &&
+            //                         DisorientsLevelGet(unit) < THSettings.Instance.SapLevel &&
+            //                         MyAuraTimeLeft(6770, unit) < 500 &&
+            //                         !DebuffCCDuration(unit, 500) &&
+            //                         !Invulnerable(unit) &&
+            //                         unit.InLineOfSpellSight
+            //                   orderby unit.Distance ascending
+            //                   select unit).FirstOrDefault();
+
+            //if (UnitSapNoCombat != null)
+            //{
+            //    Logging.Write("Found UnitSapNoCombat " + UnitSapNoCombat.Name);
+            //}
+
+            return UnitSapNoCombat != null;
+        }
+
+        private static WoWUnit UnitSapCC;
+
+        private static bool GetUnitSapCC()
+        {
+            UnitSapCC = null;
+
+            UnitSapCC = NearbyUnFriendlyPlayers.FirstOrDefault(
+                unit => unit != null && unit.IsValid &&
+                        DistanceCheck(unit) <= 10 &&
+                        FacingOverride(unit) &&
+                        !unit.Combat &&
+                        DisorientsLevelGet(unit) < THSettings.Instance.SapLevel &&
+                        MyAuraTimeLeft(6770, unit) < 500 &&
+                        !DebuffCCDuration(unit, 500) &&
+                        !Invulnerable(unit) &&
+                        unit.InLineOfSpellSight);
+
+            //UnitSapCC = (from unit in NearbyUnFriendlyPlayers
+            //             where unit != null &&
+            //                   unit.IsValid &&
+            //                   DistanceCheck(unit) <= 10 &&
+            //                   FacingOverride(unit) &&
+            //                   !unit.Combat &&
+            //                   DisorientsLevelGet(unit) < THSettings.Instance.SapLevel &&
+            //                   MyAuraTimeLeft(6770, unit) < 500 &&
+            //                   !DebuffCCDuration(unit, 500) &&
+            //                   !Invulnerable(unit) &&
+            //                   unit.InLineOfSpellSight
+            //             orderby unit.Distance ascending
+            //             select unit).FirstOrDefault();
+
+            //if (UnitSapNoCombat != null)
+            //{
+            //    Logging.Write("Found UnitSapNoCombat " + UnitSapNoCombat.Name);
+            //}
+
+            return UnitSapCC != null;
+        }
+
+        private static WoWUnit MySappedUnit;
+
+        private static bool GetMySappedUnit()
+        {
+            MySappedUnit = null;
+
+            MySappedUnit = NearbyUnFriendlyPlayers.FirstOrDefault(
+                unit => unit != null && unit.IsValid &&
+                        MyAuraTimeLeft("Sap", unit) > 500);
+
+            //MySappedUnit = (from unit in NearbyUnFriendlyPlayers
+            //                where MyAuraTimeLeft("Sap", unit) > 500
+            //                select unit).
+            //    FirstOrDefault();
+
+            //if (MySappedUnit != null)
+            //{
+            //    Logging.Write("Found MySappedUnit " + MySappedUnit.Name);
+            //}
+            return MySappedUnit != null;
+        }
+
+        private static Composite Sap()
+        {
+            return new PrioritySelector(
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.ShadowDanceSap &&
+                    SpellManager.HasSpell("Sap") &&
+                    SpellManager.HasSpell("Shadow Dance") &&
+                    !MeMounted &&
+                    !IsStealthed(Me) &&
+                    Me.Combat &&
+                    GetUnitSapCC() &&
+                    UnitSapCC != null &&
+                    UnitSapCC.IsValid &&
+                    FacingOverride(UnitSapCC) &&
+                    DistanceCheck(UnitSapCC) <= 10 &&
+                    SpellManager.CanCast("Shadow Dance"),
+                    new Action(delegate
+                        {
+                            //Logging.Write(LogLevel.Diagnostic, "Current DisorientsLevel DR Level {0}",
+                            //              DisorientsLevelGet(UnitSapCC));
+
+                            CastSpell("Shadow Dance", UnitSapCC, "ShadowDanceSap");
+                            SafelyFacingTarget(UnitSapCC);
+                            CastSpell("Sap", UnitSapCC, "UnitSapCC");
+                        })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.VanishSap &&
+                    SpellManager.HasSpell("Sap") &&
+                    SpellManager.HasSpell("Vanish") &&
+                    !MeMounted &&
+                    !IsStealthed(Me) &&
+                    Me.Combat &&
+                    GetUnitSapCC() &&
+                    UnitSapCC != null &&
+                    UnitSapCC.IsValid &&
+                    FacingOverride(UnitSapCC) &&
+                    DistanceCheck(UnitSapCC) <= 10 &&
+                    SpellManager.CanCast("Vanish"),
+                    new Action(delegate
+                        {
+                            //Logging.Write(LogLevel.Diagnostic, "Current DisorientsLevel DR Level {0}",
+                            //              DisorientsLevelGet(UnitSapCC));
+
+                            CastSpell("Vanish", UnitSapCC, "VanishSap");
+                            SafelyFacingTarget(UnitSapCC);
+                            CastSpell("Sap", UnitSapCC, "UnitSapCC");
+                        })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.SapRogueDruid &&
+                    SpellManager.HasSpell("Sap") &&
+                    !MeMounted &&
+                    GetUnitUnitRogueDruidInStealth() &&
+                    UnitRogueDruidInStealth != null &&
+                    UnitRogueDruidInStealth.IsValid &&
+                    FacingOverride(UnitRogueDruidInStealth) &&
+                    DistanceCheck(UnitRogueDruidInStealth) <= 10 &&
+                    SpellManager.CanCast("Sap"),
+                    new Action(delegate
+                        {
+                            //Logging.Write(LogLevel.Diagnostic, "Current DisorientsLevel DR Level {0}",
+                            //              DisorientsLevelGet(UnitRogueDruidInStealth));
+
+                            SafelyFacingTarget(UnitRogueDruidInStealth);
+                            CastSpell("Sap", UnitRogueDruidInStealth, "SapRogueDruid");
+                        })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.SapTarget &&
+                    SpellManager.HasSpell("Sap") &&
+                    !MeMounted &&
+                    CurrentTargetAttackable(10) &&
+                    !Me.CurrentTarget.Combat &&
+                    FacingOverride(Me.CurrentTarget) &&
+                    DisorientsLevelGet(Me.CurrentTarget) < THSettings.Instance.SapLevel &&
+                    (Me.CurrentTarget.IsHumanoid ||
+                     Me.CurrentTarget.IsBeast ||
+                     Me.CurrentTarget.IsDemon ||
+                     Me.CurrentTarget.IsDragon) &&
+                    !Me.CurrentTarget.IsBoss &&
+                    IsStealthed(Me) &&
+                    !DebuffCCDuration(Me.CurrentTarget, 500) &&
+                    //MyAuraTimeLeft(6770, Me.CurrentTarget) < 500 &&
+                    //!GetMySappedUnit() &&
+                    !DebuffCCDuration(Me.CurrentTarget, 500) &&
+                    !Invulnerable(Me.CurrentTarget) &&
+                    SpellManager.CanCast("Sap"),
+                    new Action(delegate
+                        {
+                            //Logging.Write(LogLevel.Diagnostic, "Current DisorientsLevel DR Level {0}",
+                            //              DisorientsLevelGet(Me.CurrentTarget));
+
+                            SafelyFacingTarget(Me.CurrentTarget);
+                            CastSpell("Sap", Me.CurrentTarget, "SapTarget");
+                        })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.SapFocus &&
+                    SpellManager.HasSpell("Sap") &&
+                    !MeMounted &&
+                    Me.FocusedUnit != null &&
+                    Me.FocusedUnit.IsValid &&
+                    !Me.FocusedUnit.Combat &&
+                    FacingOverride(Me.FocusedUnit) &&
+                    DistanceCheck(Me.FocusedUnit) <= 10 &&
+                    DisorientsLevelGet(Me.FocusedUnit) < THSettings.Instance.SapLevel &&
+                    Attackable(Me.FocusedUnit, 10) &&
+                    (Me.FocusedUnit.IsHumanoid ||
+                     Me.FocusedUnit.IsBeast ||
+                     Me.FocusedUnit.IsDemon ||
+                     Me.FocusedUnit.IsDragon) &&
+                    !Me.FocusedUnit.IsBoss &&
+                    IsStealthed(Me) &&
+                    !DebuffCCDuration(Me.CurrentTarget, 500) &&
+                    //MyAuraTimeLeft(6770, Me.FocusedUnit) < 500 &&
+                    //!GetMySappedUnit() &&
+                    !DebuffCCDuration(Me.FocusedUnit, 500) &&
+                    !Invulnerable(Me.FocusedUnit) &&
+                    SpellManager.CanCast("Sap"),
+                    new Action(delegate
+                        {
+                            //Logging.Write(LogLevel.Diagnostic, "Current DisorientsLevel DR Level {0}",
+                            //              DisorientsLevelGet(Me.FocusedUnit));
+
+                            SafelyFacingTarget(Me.FocusedUnit);
+                            CastSpell("Sap", Me.FocusedUnit, "SapFocus");
+                        })),
+                new Decorator(
+                    ret =>
+                    THSettings.Instance.SapAny &&
+                    SpellManager.HasSpell("Sap") &&
+                    !MeMounted &&
+                    !GetMySappedUnit() &&
+                    GetUnitSapNoCombat() &&
+                    UnitSapNoCombat != null &&
+                    UnitSapNoCombat.IsValid &&
+                    SpellManager.CanCast("Sap"),
+                    new Action(delegate
+                        {
+                            //Logging.Write(LogLevel.Diagnostic, "Current DisorientsLevel DR Level {0}",
+                            //              DisorientsLevelGet(UnitSapNoCombat));
+
+                            SafelyFacingTarget(UnitSapNoCombat);
+                            CastSpell("Sap", UnitSapNoCombat, "SapAny");
+                        }))
+                );
+        }
+
+        #endregion
+
+        #region ShadowWalk
+
+        private static Composite ShadowWalk()
+        {
+            return new Decorator(
+                ret =>
+                THSettings.Instance.ShadowWalk &&
+                SpellManager.HasSpell("Shadow Walk") &&
+                !MeMounted &&
+                IsStealthed(Me) &&
+                GetUnitUnitRogueDruidInStealth() &&
+                UnitRogueDruidInStealth != null &&
+                UnitRogueDruidInStealth.IsValid &&
+                UnitRogueDruidInStealth.Distance < 12 &&
+                SpellManager.CanCast("Shadow Walk"),
+                new Action(delegate { CastSpell("Shadow Walk", Me, "ShadowWalk"); })
+                );
+        }
+
+        #endregion
+
         #region ShadowBlades
 
         private static Composite ShadowBlades()
@@ -2924,12 +4245,119 @@ namespace TuanHARogue
             UnitShiv = null;
 
             if (UnitShiv == null &&
+                THSettings.Instance.ShivEnrage)
+            {
+                UnitShiv = NearbyUnFriendlyPlayers.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            unit.IsWithinMeleeRange &&
+                            FacingOverride(unit) &&
+                            BuffEnrage(unit));
+
+                //UnitShiv = (from unit in NearbyUnFriendlyPlayers
+                //            where unit != null &&
+                //                  unit.IsValid &&
+                //                  unit.IsWithinMeleeRange &&
+                //                  FacingOverride(unit) &&
+                //                  BuffEnrage(unit)
+                //            orderby unit.HealthPercent ascending
+                //            select unit).FirstOrDefault();
+            }
+
+            if (UnitShiv == null &&
+                THSettings.Instance.ShivCripplingPoison &&
+                Me.HasAura("Crippling Poison"))
+            {
+                UnitShiv = NearbyUnFriendlyPlayers.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            Me.CurrentTarget != null &&
+                            unit != Me.CurrentTarget &&
+                            unit.IsWithinMeleeRange &&
+                            FacingOverride(unit) &&
+                            !DebuffCC(unit) &&
+                            !DebuffRootorSnare(unit));
+
+                //UnitShiv = (from unit in NearbyUnFriendlyPlayers
+                //            where unit != null &&
+                //                  unit.IsValid &&
+                //                  Me.CurrentTarget != null &&
+                //                  unit != Me.CurrentTarget &&
+                //                  unit.IsWithinMeleeRange &&
+                //                  FacingOverride(unit) &&
+                //                  !DebuffCC(unit) &&
+                //                  !DebuffRootorSnare(unit)
+                //            orderby unit.HealthPercent ascending
+                //            select unit).FirstOrDefault();
+            }
+
+            if (UnitShiv == null &&
                 THSettings.Instance.ShivLeechingPoison &&
                 Me.HasAura("Leeching Poison") &&
                 Me.HealthPercent <= THSettings.Instance.ShivLeechingPoisonHP &&
                 CurrentTargetAttackable(5))
             {
                 UnitShiv = Me.CurrentTarget;
+            }
+
+            if (UnitShiv == null &&
+                THSettings.Instance.ShivMindNumbing &&
+                Me.HasAura("Mind-numbing Poison"))
+            {
+                UnitShiv = NearbyUnFriendlyPlayers.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            unit.IsWithinMeleeRange &&
+                            FacingOverride(unit) &&
+                            !unit.HasAura("Mind Paralysis") &&
+                            TalentSort(unit) >= 3 &&
+                            !DebuffCC(unit) &&
+                            !DebuffSilence(unit));
+
+                //UnitShiv = (from unit in NearbyUnFriendlyPlayers
+                //            where unit != null &&
+                //                  unit.IsValid &&
+                //                  unit.IsWithinMeleeRange &&
+                //                  FacingOverride(unit) &&
+                //                  !unit.HasAura("Mind Paralysis") &&
+                //                  TalentSort(unit) >= 3 &&
+                //                  !DebuffCC(unit) &&
+                //                  !DebuffSilence(unit)
+                //            orderby
+                //                unit.HealthPercent ascending
+                //            select unit).
+                //    FirstOrDefault();
+            }
+
+            if (UnitShiv == null &&
+                THSettings.Instance.ShivParalystic &&
+                Me.HasAura("Paralytic Poison"))
+            {
+                UnitShiv = NearbyUnFriendlyPlayers.FirstOrDefault(
+                    unit => unit != null && unit.IsValid &&
+                            unit.IsWithinMeleeRange &&
+                            unit.IsMoving &&
+                            FacingOverride(unit) &&
+                            !DebuffRoot(unit) &&
+                            !InvulnerableRootandSnare(unit) &&
+                            !DebuffCC(unit));
+
+                //UnitShiv = (from unit in NearbyUnFriendlyPlayers
+                //            where unit != null &&
+                //                  unit.IsValid &&
+                //                  unit.IsWithinMeleeRange &&
+                //                  FacingOverride(unit) &&
+                //                  !DebuffRoot(unit) &&
+                //                  !InvulnerableRootandSnare(unit) &&
+                //                  //(Me.CurrentTarget != null &&
+                //                  // unit == Me.CurrentTarget ||
+                //                  // TalentSort(unit) == 1 &&
+                //                  // unit.CurrentTarget != null &&
+                //                  // RaidPartyMembers.Contains(unit.CurrentTarget) &&
+                //                  // unit.CurrentTarget.HealthPercent <= THSettings.Instance.ShivParalysticHP &&
+                //                  // (unit.CurrentTarget != Me ||
+                //                  //  unit.CurrentTarget == Me &&
+                //                  //  unit.HealthPercent > Me.HealthPercent)) &&
+                //                  !DebuffCC(unit)
+                //            orderby unit.HealthPercent ascending
+                //            select unit).FirstOrDefault();
             }
             return UnitShiv != null;
         }

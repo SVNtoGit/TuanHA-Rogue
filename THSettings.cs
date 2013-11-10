@@ -17,7 +17,7 @@ namespace TuanHARogue
             : base(
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory,
                              string.Format(
-                                 @"Routines/TuanHARogue/TuanHA-Rogue-Settings-20130401-{0}.xml",
+                                 @"Routines/TuanHARogueOpenBeta/TuanHA-Rogue-Settings-20130401-{0}.xml",
                                  StyxWoW.Me.Name)))
         {
         }
@@ -276,10 +276,10 @@ namespace TuanHARogue
         [Setting, DefaultValue(true)]
         public bool InterruptAll { get; set; }
 
-        [Setting, DefaultValue(true)]
+        [Setting, DefaultValue(false)]
         public bool InterruptTarget { get; set; }
 
-        [Setting, DefaultValue(true)]
+        [Setting, DefaultValue(false)]
         public bool InterruptFocus { get; set; }
 
         [Setting, DefaultValue(true)]
@@ -399,17 +399,20 @@ namespace TuanHARogue
         [Setting, DefaultValue(3)]
         public int SapLevel { get; set; }
 
-        [Setting, DefaultValue(false)]
+        [Setting, DefaultValue(true)]
         public bool SapTarget { get; set; }
 
-        [Setting, DefaultValue(false)]
+        [Setting, DefaultValue(true)]
         public bool SapFocus { get; set; }
 
-        [Setting, DefaultValue(false)]
+        [Setting, DefaultValue(true)]
         public bool SapRogueDruid { get; set; }
 
-        [Setting, DefaultValue(false)]
+        [Setting, DefaultValue(true)]
         public bool SapAny { get; set; }
+
+        [Setting, DefaultValue(500)]
+        public int SearchInterval { get; set; }
 
         [Setting, DefaultValue(true)]
         public bool ShadowBlades { get; set; }

@@ -258,23 +258,6 @@ namespace TuanHARogue
 
         #endregion
 
-        #region CalculateTimeConsumed
-
-        private static DateTime TimeConsumed;
-
-        private static void CalculateTimeConsumedStart()
-        {
-            TimeConsumed = DateTime.Now;
-        }
-
-        private static void CalculateTimeConsumedStop(string CallFunction = "TimeConsumed")
-        {
-            Logging.Write(LogLevel.Diagnostic, "{0} take {1} ms", CallFunction,
-                          (DateTime.Now - TimeConsumed).TotalMilliseconds);
-        }
-
-        #endregion
-
         #region CanUseEquippedItem
 
         //Thank Apoc
@@ -1744,11 +1727,11 @@ namespace TuanHARogue
             //    return false;
             //}
 
-            //if (target.HasAura("Reshape Life") || //Reshape Life
-            //    target.HasAura("Convert")) //Convert
-            //{
-            //    return true;
-            //}
+            if (target.HasAura("Reshape Life") || //Reshape Life
+                target.HasAura("Convert")) //Convert
+            {
+                return true;
+            }
 
             if (IsMyPartyRaidMember(target))
             {

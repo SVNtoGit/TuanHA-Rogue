@@ -700,37 +700,9 @@ namespace TuanHARogue
         /// <summary>
         /// Credit worklifebalance http://www.thebuddyforum.com/honorbuddy-forum/developer-forum/113473-wowapplyauratype-periodicleech-temporal-displacement.html#post1107923
         /// </summary>
+        /// <param name="target"></param>
+        /// <returns></returns>
         private static DateTime DebuffDotLast;
-
-        private static HashSet<WoWApplyAuraType> HS_HasAuraTypeDOT = new HashSet<WoWApplyAuraType>()
-            {
-                WoWApplyAuraType.PeriodicDamage,
-                WoWApplyAuraType.PeriodicDamagePercent,
-                WoWApplyAuraType.PeriodicLeech
-            };
-
-        private static HashSet<int> HS_HasAuraDOT = new HashSet<int>()
-            {
-                95223, //Mass Resurrected    
-                3674, //Black Arrow
-                71328, //Dungeon Cooldown 
-                1822, //Rake
-                44457, //Living Bomb
-                106830, //Thrash
-                45181, //Cheated Death  
-                11366, //Pyroblast 
-                119611, //Renewing Mist 
-                118253, //Serpent Sting
-                118283, //Ursol's Vortex  
-                53651, //Light's Beacon 
-                57934, //Tricks of the Trade 
-                100340, //CSA Area Trigger Dummy Timer
-                57723, //Exhaustion
-                57724, //Sated
-                80354, //Temporal Displacement
-                25771, //Forbearance
-                96223, //Run Speed Marker 
-            };
 
         private static bool DebuffDot(WoWUnit target)
         {
@@ -739,126 +711,95 @@ namespace TuanHARogue
                 return false;
             }
 
-            //if (DebuffDotLast < DateTime.Now
-            //    && (InArena || InBattleground || Me.IsMoving || CurrentTargetAttackable(15))
-            //    && CurrentTargetCheckFacing
-            //    && !MeMounted
-            //    && !Me.Combat
-            //    && !Me.HasAura("Stealth")
-            //    && !Me.HasAura("Vanish"))
-            //{
-            //    DebuffDotLast = DateTime.Now + TimeSpan.FromMilliseconds(3000);
-
-            //    var auraList = target.GetAllAuras();
-
-
-            //    foreach (var aura in target.ActiveAuras)
-            //    {
-            //        if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamage ||
-            //            aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamagePercent ||
-            //            aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicLeech)
-            //        {
-            //            //Logging.Write("Dot Aura " + aura.Value.Name);
-            //            if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamage)
-            //            {
-            //                Logging.Write("Dot Aura PeriodicDamage " + aura.Value.Name + " ID: " + aura.Value.SpellId);
-            //            }
-
-            //            if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamagePercent)
-            //            {
-            //                Logging.Write("Dot Aura PeriodicDamagePercent " + aura.Value.Name + " ID: " +
-            //                              aura.Value.SpellId);
-            //            }
-
-            //            if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicLeech)
-            //            {
-            //                Logging.Write("Dot Aura PeriodicLeech " + aura.Value.Name + " ID: " + aura.Value.SpellId);
-            //            }
-            //        }
-            //    }
-
-            //CalculateTimeConsumedStart();
-
-            foreach (WoWAura aura in target.GetAllAuras())
+            if (DebuffDotLast < DateTime.Now &&
+                (InArena ||
+                 InBattleground ||
+                 Me.IsMoving ||
+                 CurrentTargetAttackable(15) &&
+                 CurrentTargetCheckFacing) &&
+                !MeMounted &&
+                !Me.Combat &&
+                !Me.HasAura("Stealth") &&
+                !Me.HasAura("Vanish"))
             {
-                if (!aura.IsActive)
-                {
-                    continue;
-                }
+                DebuffDotLast = DateTime.Now + TimeSpan.FromMilliseconds(3000);
 
-                if (HS_HasAuraDOT.Contains(aura.SpellId))
+                foreach (var aura in target.ActiveAuras)
                 {
-                    continue;
-                }
+                    if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamage ||
+                        aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamagePercent ||
+                        aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicLeech)
+                    {
+                        //Logging.Write("Dot Aura " + aura.Value.Name);
+                        if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamage)
+                        {
+                            Logging.Write("Dot Aura PeriodicDamage " + aura.Value.Name + " ID: " + aura.Value.SpellId);
+                        }
 
-                if (HS_HasAuraTypeDOT.Contains(aura.ApplyAuraType))
-                {
-                    Logging.Write("DebuffDot {0} {1} ID: {2}", aura.ApplyAuraType, aura.Name, + aura.SpellId);
-                    //CalculateTimeConsumedStop("DebuffDot Found New Method");
-                    return true;
+                        if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamagePercent)
+                        {
+                            Logging.Write("Dot Aura PeriodicDamagePercent " + aura.Value.Name + " ID: " +
+                                          aura.Value.SpellId);
+                        }
+
+                        if (aura.Value.ApplyAuraType == WoWApplyAuraType.PeriodicLeech)
+                        {
+                            Logging.Write("Dot Aura PeriodicLeech " + aura.Value.Name + " ID: " + aura.Value.SpellId);
+                        }
+                    }
                 }
             }
 
-            //if (target.Debuffs.Any(
-            //    a =>
-            //    a.Value.SpellId != 95223 && //Mass Resurrected    
-            //    a.Value.SpellId != 3674 && //Black Arrow
-            //    a.Value.SpellId != 71328 && //Dungeon Cooldown 
-            //    a.Value.SpellId != 1822 && //Rake
-            //    a.Value.SpellId != 44457 && //Living Bomb
-            //    a.Value.SpellId != 106830 && //Thrash
-            //    a.Value.SpellId != 45181 && //Cheated Death  
-            //    a.Value.SpellId != 11366 && //Pyroblast 
-            //    a.Value.SpellId != 119611 && //Renewing Mist 
-            //    a.Value.SpellId != 118253 && //Serpent Sting
-            //    a.Value.SpellId != 118283 && //Ursol's Vortex  
-            //    a.Value.SpellId != 53651 && //Light's Beacon 
-            //    a.Value.SpellId != 57934 && //Tricks of the Trade 
-            //    a.Value.SpellId != 100340 && //CSA Area Trigger Dummy Timer
-            //    a.Value.SpellId != 57723 && //Exhaustion
-            //    a.Value.SpellId != 57724 && //Sated
-            //    a.Value.SpellId != 80354 && //Temporal Displacement
-            //    (a.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamage ||
-            //     a.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamagePercent ||
-            //     a.Value.ApplyAuraType == WoWApplyAuraType.PeriodicLeech)
-            //    ))
-            //{
-            //    CalculateTimeConsumedStop("DebuffDot");
-            //    return true;
-            //}
-
-            //CalculateTimeConsumedStop("DebuffDot Found Old Method");
-            return false;
+            return target.Debuffs.Any(
+                a =>
+                a.Value.SpellId != 95223 && //Mass Resurrected    
+                a.Value.SpellId != 3674 && //Black Arrow
+                a.Value.SpellId != 71328 && //Dungeon Cooldown 
+                a.Value.SpellId != 1822 && //Rake
+                a.Value.SpellId != 44457 && //Living Bomb
+                a.Value.SpellId != 106830 && //Thrash
+                a.Value.SpellId != 45181 && //Cheated Death  
+                a.Value.SpellId != 11366 && //Pyroblast 
+                a.Value.SpellId != 119611 && //Renewing Mist 
+                a.Value.SpellId != 118253 && //Serpent Sting
+                a.Value.SpellId != 118283 && //Ursol's Vortex  
+                a.Value.SpellId != 53651 && //Light's Beacon 
+                a.Value.SpellId != 57934 && //Tricks of the Trade 
+                a.Value.SpellId != 100340 && //CSA Area Trigger Dummy Timer
+                a.Value.SpellId != 57723 && //Exhaustion
+                a.Value.SpellId != 57724 && //Sated
+                a.Value.SpellId != 80354 && //Temporal Displacement
+                (a.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamage ||
+                 a.Value.ApplyAuraType == WoWApplyAuraType.PeriodicDamagePercent ||
+                 a.Value.ApplyAuraType == WoWApplyAuraType.PeriodicLeech)
+                );
         }
 
         #endregion
 
         #region DebuffFearDuration
 
-        private static readonly
-            HashSet<int> DebuffFearDurationHS = new HashSet<int>
-                {
-                    5782, //Fear
-                    118699, //Fear
-                    130616, //Fear (Glyph of Fear)
-                    5484, //Howl of Terror
-                    113056, //Intimidating Roar [Cowering in fear] (Warrior)
-                    113004, //Intimidating Roar [Fleeing in fear] (Warrior)
-                    5246, //Intimidating Shout (aoe)
-                    20511, //Intimidating Shout (targeted)
-                    115268, //Mesmerize (Shivarra)
-                    64044, //Psychic Horror
-                    8122, //Psychic Scream
-                    113792, //Psychic Terror (Psyfiend)
-                    132412, //Seduction (Grimoire of Sacrifice)
-                    6358, //Seduction (Succubus)
-                    87204, //Sin and Punishment
-                    104045 //Sleep (Metamorphosis)
-                };
+        private static readonly HashSet<int> DebuffFearDurationHS = new HashSet<int>
+            {
+                5782, //Fear
+                118699, //Fear
+                130616, //Fear (Glyph of Fear)
+                5484, //Howl of Terror
+                113056, //Intimidating Roar [Cowering in fear] (Warrior)
+                113004, //Intimidating Roar [Fleeing in fear] (Warrior)
+                5246, //Intimidating Shout (aoe)
+                20511, //Intimidating Shout (targeted)
+                115268, //Mesmerize (Shivarra)
+                64044, //Psychic Horror
+                8122, //Psychic Scream
+                113792, //Psychic Terror (Psyfiend)
+                132412, //Seduction (Grimoire of Sacrifice)
+                6358, //Seduction (Succubus)
+                87204, //Sin and Punishment
+                104045 //Sleep (Metamorphosis)
+            };
 
-        private static
-            bool DebuffFearDuration
-            (WoWUnit target, double duration)
+        private static bool DebuffFearDuration(WoWUnit target, double duration)
         {
             if (target == null || !target.IsValid)
             {
@@ -885,45 +826,41 @@ namespace TuanHARogue
 
         #region DebuffRoot
 
-        private static readonly
-            HashSet<int> DebuffRootHS = new HashSet<int>
-                {
-                    96294, //Chains of Ice (Chilblains)
-                    116706, //Disable
-                    64695, //Earthgrab (Earthgrab Totem)
-                    339, //Entangling Roots
-                    113770, //Entangling Roots (Force of Nature - Balance Treants)
-                    19975, //Entangling Roots (Nature's Grasp)
-                    113275, //Entangling Roots (Symbiosis)
-                    113275, //Entangling Roots (Symbiosis)
-                    19185, //Entrapment
-                    33395, //Freeze
-                    63685, //Freeze (Frozen Power)
-                    39965, //Frost Grenade
-                    122, //Frost Nova
-                    110693, //Frost Nova (Mage)
-                    55536, //Frostweave Net
-                    87194, //Glyph of Mind Blast
-                    111340, //Ice Ward
-                    45334, //Immobilized (Wild Charge - Bear)
-                    90327, //Lock Jaw (Dog)
-                    102359, //Mass Entanglement
-                    128405, //Narrow Escape
-                    13099, //Net-o-Matic
-                    115197, //Partial Paralysis
-                    50245, //Pin (Crab)
-                    91807, //Shambling Rush (Dark Transformation)
-                    123407, //Spinning Fire Blossom
-                    107566, //Staggering Shout
-                    54706, //Venom Web Spray (Silithid)
-                    114404, //Void Tendril's Grasp
-                    4167, //Web (Spider)
-                };
+        private static readonly HashSet<int> DebuffRootHS = new HashSet<int>
+            {
+                96294, //Chains of Ice (Chilblains)
+                116706, //Disable
+                64695, //Earthgrab (Earthgrab Totem)
+                339, //Entangling Roots
+                113770, //Entangling Roots (Force of Nature - Balance Treants)
+                19975, //Entangling Roots (Nature's Grasp)
+                113275, //Entangling Roots (Symbiosis)
+                113275, //Entangling Roots (Symbiosis)
+                19185, //Entrapment
+                33395, //Freeze
+                63685, //Freeze (Frozen Power)
+                39965, //Frost Grenade
+                122, //Frost Nova
+                110693, //Frost Nova (Mage)
+                55536, //Frostweave Net
+                87194, //Glyph of Mind Blast
+                111340, //Ice Ward
+                45334, //Immobilized (Wild Charge - Bear)
+                90327, //Lock Jaw (Dog)
+                102359, //Mass Entanglement
+                128405, //Narrow Escape
+                13099, //Net-o-Matic
+                115197, //Partial Paralysis
+                50245, //Pin (Crab)
+                91807, //Shambling Rush (Dark Transformation)
+                123407, //Spinning Fire Blossom
+                107566, //Staggering Shout
+                54706, //Venom Web Spray (Silithid)
+                114404, //Void Tendril's Grasp
+                4167, //Web (Spider)
+            };
 
-        private static
-            bool DebuffRoot
-            (WoWUnit
-                 target)
+        private static bool DebuffRoot(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -946,34 +883,30 @@ namespace TuanHARogue
 
         #region DebuffRootCanCloak
 
-        private static readonly
-            HashSet<int> DebuffRootCanCloakHS = new HashSet<int>
-                {
-                    96294, //Chains of Ice (Chilblains)
-                    64695, //Earthgrab (Earthgrab Totem)
-                    339, //Entangling Roots
-                    113770, //Entangling Roots (Force of Nature - Balance Treants)
-                    19975, //Entangling Roots (Nature's Grasp)
-                    113275, //Entangling Roots (Symbiosis)
-                    113275, //Entangling Roots (Symbiosis)
-                    19185, //Entrapment
-                    33395, //Freeze
-                    63685, //Freeze (Frozen Power)
-                    122, //Frost Nova
-                    110693, //Frost Nova (Mage)
-                    87194, //Glyph of Mind Blast
-                    111340, //Ice Ward
-                    102359, //Mass Entanglement
-                    123407, //Spinning Fire Blossom
-                    54706, //Venom Web Spray (Silithid)
-                    114404, //Void Tendril's Grasp
-                    4167, //Web (Spider)
-                };
+        private static readonly HashSet<int> DebuffRootCanCloakHS = new HashSet<int>
+            {
+                96294, //Chains of Ice (Chilblains)
+                64695, //Earthgrab (Earthgrab Totem)
+                339, //Entangling Roots
+                113770, //Entangling Roots (Force of Nature - Balance Treants)
+                19975, //Entangling Roots (Nature's Grasp)
+                113275, //Entangling Roots (Symbiosis)
+                113275, //Entangling Roots (Symbiosis)
+                19185, //Entrapment
+                33395, //Freeze
+                63685, //Freeze (Frozen Power)
+                122, //Frost Nova
+                110693, //Frost Nova (Mage)
+                87194, //Glyph of Mind Blast
+                111340, //Ice Ward
+                102359, //Mass Entanglement
+                123407, //Spinning Fire Blossom
+                54706, //Venom Web Spray (Silithid)
+                114404, //Void Tendril's Grasp
+                4167, //Web (Spider)
+            };
 
-        private static
-            bool DebuffRootCanCloak
-            (WoWUnit
-                 target)
+        private static bool DebuffRootCanCloak(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -984,8 +917,7 @@ namespace TuanHARogue
             {
                 if (target.ActiveAuras.Any(
                     a =>
-                    a.Value.ApplyAuraType == WoWApplyAuraType.ModRoot &&
-                    a.Value.Spell.DispelType == WoWDispelType.Magic ||
+                    a.Value.ApplyAuraType == WoWApplyAuraType.ModRoot && a.Value.Spell.DispelType == WoWDispelType.Magic ||
                     DebuffRootHS.Contains(a.Value.SpellId)))
                 {
                     //Logging.Write(target.Name + " got DebuffRoot");
@@ -999,36 +931,32 @@ namespace TuanHARogue
 
         #region DebuffRootCanCleanse
 
-        private static readonly
-            HashSet<int> DebuffRootCanCleanseHS = new HashSet<int>
-                {
-                    96294, //Chains of Ice (Chilblains)
-                    64695, //Earthgrab (Earthgrab Totem)
-                    339, //Entangling Roots
-                    113770, //Entangling Roots (Force of Nature - Balance Treants)
-                    19975, //Entangling Roots (Nature's Grasp)
-                    113275, //Entangling Roots (Symbiosis)
-                    113275, //Entangling Roots (Symbiosis)
-                    19185, //Entrapment
-                    33395, //Freeze
-                    63685, //Freeze (Frozen Power)
-                    122, //Frost Nova
-                    110693, //Frost Nova (Mage)
-                    87194, //Glyph of Mind Blast
-                    111340, //Ice Ward
-                    102359, //Mass Entanglement
-                    115197, //Partial Paralysis
-                    91807, //Shambling Rush (Dark Transformation)
-                    123407, //Spinning Fire Blossom
-                    54706, //Venom Web Spray (Silithid)
-                    114404, //Void Tendril's Grasp
-                    4167, //Web (Spider)
-                };
+        private static readonly HashSet<int> DebuffRootCanCleanseHS = new HashSet<int>
+            {
+                96294, //Chains of Ice (Chilblains)
+                64695, //Earthgrab (Earthgrab Totem)
+                339, //Entangling Roots
+                113770, //Entangling Roots (Force of Nature - Balance Treants)
+                19975, //Entangling Roots (Nature's Grasp)
+                113275, //Entangling Roots (Symbiosis)
+                113275, //Entangling Roots (Symbiosis)
+                19185, //Entrapment
+                33395, //Freeze
+                63685, //Freeze (Frozen Power)
+                122, //Frost Nova
+                110693, //Frost Nova (Mage)
+                87194, //Glyph of Mind Blast
+                111340, //Ice Ward
+                102359, //Mass Entanglement
+                115197, //Partial Paralysis
+                91807, //Shambling Rush (Dark Transformation)
+                123407, //Spinning Fire Blossom
+                54706, //Venom Web Spray (Silithid)
+                114404, //Void Tendril's Grasp
+                4167, //Web (Spider)
+            };
 
-        private static
-            bool DebuffRootCanCleanse
-            (WoWUnit
-                 target)
+        private static bool DebuffRootCanCleanse(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1050,87 +978,83 @@ namespace TuanHARogue
 
         #region DebuffRootorSnare
 
-        private static readonly
-            HashSet<int> DebuffRootorSnareHS = new HashSet<int>
-                {
-                    96294, //Chains of Ice (Chilblains)
-                    116706, //Disable
-                    64695, //Earthgrab (Earthgrab Totem)
-                    339, //Entangling Roots
-                    113770, //Entangling Roots (Force of Nature - Balance Treants)
-                    19975, //Entangling Roots (Nature's Grasp)
-                    113275, //Entangling Roots (Symbiosis)
-                    113275, //Entangling Roots (Symbiosis)
-                    19185, //Entrapment
-                    33395, //Freeze
-                    63685, //Freeze (Frozen Power)
-                    39965, //Frost Grenade
-                    122, //Frost Nova
-                    110693, //Frost Nova (Mage)
-                    55536, //Frostweave Net
-                    87194, //Glyph of Mind Blast
-                    111340, //Ice Ward
-                    45334, //Immobilized (Wild Charge - Bear)
-                    90327, //Lock Jaw (Dog)
-                    102359, //Mass Entanglement
-                    128405, //Narrow Escape
-                    13099, //Net-o-Matic
-                    115197, //Partial Paralysis
-                    50245, //Pin (Crab)
-                    91807, //Shambling Rush (Dark Transformation)
-                    123407, //Spinning Fire Blossom
-                    107566, //Staggering Shout
-                    54706, //Venom Web Spray (Silithid)
-                    114404, //Void Tendril's Grasp
-                    4167, //Web (Spider)
-                    50433, //Ankle Crack (Crocolisk)
-                    110300, //Burden of Guilt
-                    35101, //Concussive Barrage
-                    5116, //Concussive Shot
-                    120, //Cone of Cold
-                    3409, //Crippling Poison
-                    18223, //Curse of Exhaustion
-                    45524, //Chains of Ice
-                    50435, //Chilblains
-                    121288, //Chilled (Frost Armor)
-                    1604, //Dazed
-                    63529, //Dazed - Avenger's Shield
-                    50259, //Dazed (Wild Charge - Cat)
-                    26679, //Deadly Throw
-                    119696, //Debilitation
-                    116095, //Disable
-                    123727, //Dizzying Haze
-                    3600, //Earthbind (Earthbind Totem)
-                    77478, //Earthquake (Glyph of Unstable Earth)
-                    123586, //Flying Serpent Kick
-                    113092, //Frost Bomb
-                    54644, //Frost Breath (Chimaera)
-                    8056, //Frost Shock
-                    116, //Frostbolt
-                    8034, //Frostbrand Attack
-                    44614, //Frostfire Bolt
-                    61394, //Frozen Wake (Glyph of Freezing Trap)
-                    1715, //Hamstring
-                    13810, //Ice Trap
-                    58180, //Infected Wounds
-                    118585, //Leer of the Ox
-                    15407, //Mind Flay
-                    12323, //Piercing Howl
-                    115000, //Remorseless Winter
-                    20170, //Seal of Justice
-                    47960, //Shadowflame
-                    31589, //Slow
-                    129923, //Sluggish (Glyph of Hindering Strikes)
-                    61391, //Typhoon
-                    51490, //Thunderstorm
-                    127797, //Ursol's Vortex
-                    137637, //Warbringer
-                };
+        private static readonly HashSet<int> DebuffRootorSnareHS = new HashSet<int>
+            {
+                96294, //Chains of Ice (Chilblains)
+                116706, //Disable
+                64695, //Earthgrab (Earthgrab Totem)
+                339, //Entangling Roots
+                113770, //Entangling Roots (Force of Nature - Balance Treants)
+                19975, //Entangling Roots (Nature's Grasp)
+                113275, //Entangling Roots (Symbiosis)
+                113275, //Entangling Roots (Symbiosis)
+                19185, //Entrapment
+                33395, //Freeze
+                63685, //Freeze (Frozen Power)
+                39965, //Frost Grenade
+                122, //Frost Nova
+                110693, //Frost Nova (Mage)
+                55536, //Frostweave Net
+                87194, //Glyph of Mind Blast
+                111340, //Ice Ward
+                45334, //Immobilized (Wild Charge - Bear)
+                90327, //Lock Jaw (Dog)
+                102359, //Mass Entanglement
+                128405, //Narrow Escape
+                13099, //Net-o-Matic
+                115197, //Partial Paralysis
+                50245, //Pin (Crab)
+                91807, //Shambling Rush (Dark Transformation)
+                123407, //Spinning Fire Blossom
+                107566, //Staggering Shout
+                54706, //Venom Web Spray (Silithid)
+                114404, //Void Tendril's Grasp
+                4167, //Web (Spider)
+                50433, //Ankle Crack (Crocolisk)
+                110300, //Burden of Guilt
+                35101, //Concussive Barrage
+                5116, //Concussive Shot
+                120, //Cone of Cold
+                3409, //Crippling Poison
+                18223, //Curse of Exhaustion
+                45524, //Chains of Ice
+                50435, //Chilblains
+                121288, //Chilled (Frost Armor)
+                1604, //Dazed
+                63529, //Dazed - Avenger's Shield
+                50259, //Dazed (Wild Charge - Cat)
+                26679, //Deadly Throw
+                119696, //Debilitation
+                116095, //Disable
+                123727, //Dizzying Haze
+                3600, //Earthbind (Earthbind Totem)
+                77478, //Earthquake (Glyph of Unstable Earth)
+                123586, //Flying Serpent Kick
+                113092, //Frost Bomb
+                54644, //Frost Breath (Chimaera)
+                8056, //Frost Shock
+                116, //Frostbolt
+                8034, //Frostbrand Attack
+                44614, //Frostfire Bolt
+                61394, //Frozen Wake (Glyph of Freezing Trap)
+                1715, //Hamstring
+                13810, //Ice Trap
+                58180, //Infected Wounds
+                118585, //Leer of the Ox
+                15407, //Mind Flay
+                12323, //Piercing Howl
+                115000, //Remorseless Winter
+                20170, //Seal of Justice
+                47960, //Shadowflame
+                31589, //Slow
+                129923, //Sluggish (Glyph of Hindering Strikes)
+                61391, //Typhoon
+                51490, //Thunderstorm
+                127797, //Ursol's Vortex
+                137637, //Warbringer
+            };
 
-        private static
-            bool DebuffRootorSnare
-            (WoWUnit
-                 target)
+        private static bool DebuffRootorSnare(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1147,10 +1071,7 @@ namespace TuanHARogue
             }
         }
 
-        private static
-            int DebuffRootorSnareCount
-            (WoWUnit
-                 target)
+        private static int DebuffRootorSnareCount(WoWUnit target)
         {
             return
                 target.ActiveAuras.Count(
@@ -1164,37 +1085,33 @@ namespace TuanHARogue
 
         #region DebuffSilence
 
-        private static readonly
-            HashSet<int> DebuffSilenceHS = new HashSet<int>
-                {
-                    129597, //Arcane Torrent (Chi)
-                    25046, //Arcane Torrent (Energy)
-                    80483, //Arcane Torrent (Focus)
-                    28730, //Arcane Torrent (Mana)
-                    69179, //Arcane Torrent (Rage)
-                    50613, //Arcane Torrent (Runic Power)
-                    31935, //Avenger's Shield
-                    114238, //Fae Silence (Glyph of Fae Silence)
-                    102051, //Frostjaw (also a root)
-                    1330, //Garrote - Silence
-                    115782, //Optical Blast (Observer)
-                    15487, //Silence
-                    18498, //Silenced - Gag Order
-                    55021, //Silenced - Improved Counterspell
-                    34490, //Silencing Shot
-                    81261, //Solar Beam
-                    113287, //Solar Beam (Symbiosis)
-                    116709, //Spear Hand Strike
-                    24259, //Spell Lock (Felhunter)
-                    132409, //Spell Lock (Grimoire of Sacrifice)
-                    47476, //Strangulate
-                    31117, //Unstable Affliction
-                };
+        private static readonly HashSet<int> DebuffSilenceHS = new HashSet<int>
+            {
+                129597, //Arcane Torrent (Chi)
+                25046, //Arcane Torrent (Energy)
+                80483, //Arcane Torrent (Focus)
+                28730, //Arcane Torrent (Mana)
+                69179, //Arcane Torrent (Rage)
+                50613, //Arcane Torrent (Runic Power)
+                31935, //Avenger's Shield
+                114238, //Fae Silence (Glyph of Fae Silence)
+                102051, //Frostjaw (also a root)
+                1330, //Garrote - Silence
+                115782, //Optical Blast (Observer)
+                15487, //Silence
+                18498, //Silenced - Gag Order
+                55021, //Silenced - Improved Counterspell
+                34490, //Silencing Shot
+                81261, //Solar Beam
+                113287, //Solar Beam (Symbiosis)
+                116709, //Spear Hand Strike
+                24259, //Spell Lock (Felhunter)
+                132409, //Spell Lock (Grimoire of Sacrifice)
+                47476, //Strangulate
+                31117, //Unstable Affliction
+            };
 
-        private static
-            bool DebuffSilence
-            (WoWUnit
-                 target)
+        private static bool DebuffSilence(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1220,57 +1137,53 @@ namespace TuanHARogue
 
         #region DebuffSnare
 
-        private static readonly
-            HashSet<int> DebuffSnareHS = new HashSet<int>
-                {
-                    50433, //Ankle Crack (Crocolisk)
-                    110300, //Burden of Guilt
-                    35101, //Concussive Barrage
-                    5116, //Concussive Shot
-                    120, //Cone of Cold
-                    3409, //Crippling Poison
-                    18223, //Curse of Exhaustion
-                    45524, //Chains of Ice
-                    50435, //Chilblains
-                    121288, //Chilled (Frost Armor)
-                    1604, //Dazed
-                    63529, //Dazed - Avenger's Shield
-                    50259, //Dazed (Wild Charge - Cat)
-                    26679, //Deadly Throw
-                    119696, //Debilitation
-                    116095, //Disable
-                    123727, //Dizzying Haze
-                    3600, //Earthbind (Earthbind Totem)
-                    77478, //Earthquake (Glyph of Unstable Earth)
-                    123586, //Flying Serpent Kick
-                    113092, //Frost Bomb
-                    54644, //Frost Breath (Chimaera)
-                    8056, //Frost Shock
-                    116, //Frostbolt
-                    8034, //Frostbrand Attack
-                    44614, //Frostfire Bolt
-                    61394, //Frozen Wake (Glyph of Freezing Trap)
-                    1715, //Hamstring
-                    13810, //Ice Trap
-                    58180, //Infected Wounds
-                    118585, //Leer of the Ox
-                    15407, //Mind Flay
-                    12323, //Piercing Howl
-                    115000, //Remorseless Winter
-                    20170, //Seal of Justice
-                    47960, //Shadowflame
-                    31589, //Slow
-                    129923, //Sluggish (Glyph of Hindering Strikes)
-                    61391, //Typhoon
-                    51490, //Thunderstorm
-                    127797, //Ursol's Vortex
-                    137637, //Warbringer
-                };
+        private static readonly HashSet<int> DebuffSnareHS = new HashSet<int>
+            {
+                50433, //Ankle Crack (Crocolisk)
+                110300, //Burden of Guilt
+                35101, //Concussive Barrage
+                5116, //Concussive Shot
+                120, //Cone of Cold
+                3409, //Crippling Poison
+                18223, //Curse of Exhaustion
+                45524, //Chains of Ice
+                50435, //Chilblains
+                121288, //Chilled (Frost Armor)
+                1604, //Dazed
+                63529, //Dazed - Avenger's Shield
+                50259, //Dazed (Wild Charge - Cat)
+                26679, //Deadly Throw
+                119696, //Debilitation
+                116095, //Disable
+                123727, //Dizzying Haze
+                3600, //Earthbind (Earthbind Totem)
+                77478, //Earthquake (Glyph of Unstable Earth)
+                123586, //Flying Serpent Kick
+                113092, //Frost Bomb
+                54644, //Frost Breath (Chimaera)
+                8056, //Frost Shock
+                116, //Frostbolt
+                8034, //Frostbrand Attack
+                44614, //Frostfire Bolt
+                61394, //Frozen Wake (Glyph of Freezing Trap)
+                1715, //Hamstring
+                13810, //Ice Trap
+                58180, //Infected Wounds
+                118585, //Leer of the Ox
+                15407, //Mind Flay
+                12323, //Piercing Howl
+                115000, //Remorseless Winter
+                20170, //Seal of Justice
+                47960, //Shadowflame
+                31589, //Slow
+                129923, //Sluggish (Glyph of Hindering Strikes)
+                61391, //Typhoon
+                51490, //Thunderstorm
+                127797, //Ursol's Vortex
+                137637, //Warbringer
+            };
 
-        private static
-            bool DebuffSnare
-            (WoWUnit
-                 target)
+        private static bool DebuffSnare(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1290,43 +1203,40 @@ namespace TuanHARogue
 
         #region DebuffStunDuration
 
-        private static readonly
-            HashSet<int> DebuffStunDurationHS = new HashSet<int>
-                {
-                    89766, //Axe Toss (Felguard/Wrathguard)
-                    113801, //Bash (Force of Nature - Feral Treants)
-                    102795, //Bear Hug
-                    117526, //Binding Shot
-                    126451, //Clash
-                    122242, //Clash (not sure which one is right)
-                    119392, //Charging Ox Wave
-                    1833, //Cheap Shot
-                    44572, //Deep Freeze
-                    54786, //Demonic Leap (Metamorphosis)
-                    105593, //Fist of Justice
-                    117418, //Fists of Fury
-                    91800, //Gnaw
-                    853, //Hammer of Justice
-                    110698, //Hammer of Justice (Paladin)
-                    24394, //Intimidation
-                    408, //Kidney Shot
-                    119381, //Leg Sweep
-                    5211, //Mighty Bash
-                    91797, //Monstrous Blow (Dark Transformation)
-                    9005, //Pounce
-                    102546, //Pounce (Incarnation)
-                    115001, //Remorseless Winter
-                    82691, //Ring of Frost
-                    30283, //Shadowfury
-                    132168, //Shockwave
-                    118905, //Static Charge (Capacitor Totem)
-                    20549, //War Stomp
-                    108194 //Asphyxiate
-                };
+        private static readonly HashSet<int> DebuffStunDurationHS = new HashSet<int>
+            {
+                89766, //Axe Toss (Felguard/Wrathguard)
+                113801, //Bash (Force of Nature - Feral Treants)
+                102795, //Bear Hug
+                117526, //Binding Shot
+                126451, //Clash
+                122242, //Clash (not sure which one is right)
+                119392, //Charging Ox Wave
+                1833, //Cheap Shot
+                44572, //Deep Freeze
+                54786, //Demonic Leap (Metamorphosis)
+                105593, //Fist of Justice
+                117418, //Fists of Fury
+                91800, //Gnaw
+                853, //Hammer of Justice
+                110698, //Hammer of Justice (Paladin)
+                24394, //Intimidation
+                408, //Kidney Shot
+                119381, //Leg Sweep
+                5211, //Mighty Bash
+                91797, //Monstrous Blow (Dark Transformation)
+                9005, //Pounce
+                102546, //Pounce (Incarnation)
+                115001, //Remorseless Winter
+                82691, //Ring of Frost
+                30283, //Shadowfury
+                132168, //Shockwave
+                118905, //Static Charge (Capacitor Totem)
+                20549, //War Stomp
+                108194 //Asphyxiate
+            };
 
-        private static
-            bool DebuffStunDuration
-            (WoWUnit target, double duration)
+        private static bool DebuffStunDuration(WoWUnit target, double duration)
         {
             if (target == null || !target.IsValid)
             {
@@ -1343,10 +1253,7 @@ namespace TuanHARogue
             }
         }
 
-        private static
-            bool DebuffStun
-            (WoWUnit
-                 target)
+        private static bool DebuffStun(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1362,10 +1269,7 @@ namespace TuanHARogue
             }
         }
 
-        private static
-            double DebuffStunDurationTimeLeft
-            (WoWUnit
-                 target)
+        private static double DebuffStunDurationTimeLeft(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1394,25 +1298,20 @@ namespace TuanHARogue
 
         #region Invulnerable
 
-        private static readonly
-            HashSet<string> InvulnerableHS = new HashSet<string>
-                {
-                    "Hand of Protection", //Rogue Only
-                    "Shield Block", //Rogue Only
-                    //"Bladestorm",
-                    "Cyclone",
-                    //"Desecrated Ground",
-                    "Deterrence",
-                    "Dispersion",
-                    "Divine Shield", //Grapple Weapon (Monk)
-                    "Ice Block",
-                    "Dematerialize",
-                };
+        private static readonly HashSet<string> InvulnerableHS = new HashSet<string>
+            {
+                "Hand of Protection", //Rogue Only
+                "Shield Block", //Rogue Only
+                //"Bladestorm",
+                "Cyclone",
+                //"Desecrated Ground",
+                "Deterrence",
+                "Dispersion",
+                "Divine Shield", //Grapple Weapon (Monk)
+                "Ice Block"
+            };
 
-        private static
-            bool Invulnerable
-            (WoWUnit
-                 target)
+        private static bool Invulnerable(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1434,10 +1333,7 @@ namespace TuanHARogue
 
         #region InvulnerablePhysic
 
-        private static
-            bool InvulnerablePhysic
-            (WoWUnit
-                 target)
+        private static bool InvulnerablePhysic(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1451,23 +1347,19 @@ namespace TuanHARogue
 
         #region InvulnerableSpell
 
-        private static readonly
-            HashSet<string> InvulnerableSpellHS = new HashSet<string>
-                {
-                    "Anti-Magic Shell",
-                    "Cloak of Shadows",
-                    "Glyph of Ice Block",
-                    "Grounding Totem Effect",
-                    "Mass Spell Reflection",
-                    "Phantasm",
-                    "Spell Reflection",
-                    "Zen Meditation"
-                };
+        private static readonly HashSet<string> InvulnerableSpellHS = new HashSet<string>
+            {
+                "Anti-Magic Shell",
+                "Cloak of Shadows",
+                "Glyph of Ice Block",
+                "Grounding Totem Effect",
+                "Mass Spell Reflection",
+                "Phantasm",
+                "Spell Reflection",
+                "Zen Meditation"
+            };
 
-        private static
-            bool InvulnerableSpell
-            (WoWUnit
-                 target)
+        private static bool InvulnerableSpell(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1489,18 +1381,14 @@ namespace TuanHARogue
 
         #region InvulnerableRootandSnare
 
-        private static readonly
-            HashSet<string> InvulnerableRootandSnareHS = new HashSet<string>
-                {
-                    "Master's Call",
-                    "Bladestorm",
-                    "Hand of Freedom"
-                };
+        private static readonly HashSet<string> InvulnerableRootandSnareHS = new HashSet<string>
+            {
+                "Master's Call",
+                "Bladestorm",
+                "Hand of Freedom"
+            };
 
-        private static
-            bool InvulnerableRootandSnare
-            (WoWUnit
-                 target)
+        private static bool InvulnerableRootandSnare(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1522,17 +1410,13 @@ namespace TuanHARogue
 
         #region InvulnerableStun
 
-        private static readonly
-            HashSet<string> InvulnerableStunHS = new HashSet<string>
-                {
-                    "Icebound Fortitude",
-                    "Bladestorm"
-                };
+        private static readonly HashSet<string> InvulnerableStunHS = new HashSet<string>
+            {
+                "Icebound Fortitude",
+                "Bladestorm"
+            };
 
-        private static
-            bool InvulnerableStun
-            (WoWUnit
-                 target)
+        private static bool InvulnerableStun(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1554,17 +1438,13 @@ namespace TuanHARogue
 
         #region SafeUsingCooldown
 
-        private static readonly
-            HashSet<string> SafeUsingCooldownHS = new HashSet<string>
-                {
-                    "Evasion",
-                    "Bladestorm",
-                };
+        private static readonly HashSet<string> SafeUsingCooldownHS = new HashSet<string>
+            {
+                "Evasion",
+                "Bladestorm",
+            };
 
-        private static
-            bool SafeUsingCooldown
-            (WoWUnit
-                 target)
+        private static bool SafeUsingCooldown(WoWUnit target)
         {
             if (target == null || !target.IsValid)
             {
@@ -1591,10 +1471,7 @@ namespace TuanHARogue
 
         #region WriteDebuff
 
-        private static
-            void WriteDebuff
-            (WoWUnit
-                 target)
+        private static void WriteDebuff(WoWUnit target)
         {
             if (target == null || !target.IsValid)
                 return;
@@ -1603,8 +1480,7 @@ namespace TuanHARogue
                 if (!aura.Value.IsHarmful) continue; //Name: Battle Fatigue (134735)
                 if (aura.Value.SpellId == 134735) continue; //Name: Battle Fatigue (134735)
                 var spell = aura.Value.Spell;
-                Logging.Write("--------" + aura.Value.Name + " (" + aura.Value.SpellId + ")" + " (" + target.Class +
-                              ")" +
+                Logging.Write("--------" + aura.Value.Name + " (" + aura.Value.SpellId + ")" + " (" + target.Class + ")" +
                               "--------");
                 //Logging.Write("Name: " + aura.Value.Name + " (" + aura.Value.SpellId + ")");
                 Logging.Write("ApplyAuraType: " + aura.Value.ApplyAuraType);

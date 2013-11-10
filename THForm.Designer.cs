@@ -84,7 +84,9 @@
             this.label2 = new System.Windows.Forms.Label();
             this.PoisonLethal = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
             this.AutoAoE = new System.Windows.Forms.CheckBox();
+            this.SearchInterval = new System.Windows.Forms.NumericUpDown();
             this.UseFood = new System.Windows.Forms.CheckBox();
             this.Backward = new System.Windows.Forms.ComboBox();
             this.PauseKey = new System.Windows.Forms.ComboBox();
@@ -245,6 +247,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.ProfBuffHP)).BeginInit();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FanofKnivesUnit)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SearchInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.UnittoStartAoE)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.UseFoodHP)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -383,7 +386,6 @@
             // VanishSap
             // 
             this.VanishSap.AutoSize = true;
-            this.VanishSap.Enabled = false;
             this.VanishSap.Location = new System.Drawing.Point(97, 254);
             this.VanishSap.Name = "VanishSap";
             this.VanishSap.Size = new System.Drawing.Size(97, 17);
@@ -395,7 +397,6 @@
             // ShadowDanceSap
             // 
             this.ShadowDanceSap.AutoSize = true;
-            this.ShadowDanceSap.Enabled = false;
             this.ShadowDanceSap.Location = new System.Drawing.Point(97, 162);
             this.ShadowDanceSap.Name = "ShadowDanceSap";
             this.ShadowDanceSap.Size = new System.Drawing.Size(97, 17);
@@ -942,7 +943,9 @@
             this.groupBox3.Controls.Add(this.label2);
             this.groupBox3.Controls.Add(this.PoisonLethal);
             this.groupBox3.Controls.Add(this.label1);
+            this.groupBox3.Controls.Add(this.label11);
             this.groupBox3.Controls.Add(this.AutoAoE);
+            this.groupBox3.Controls.Add(this.SearchInterval);
             this.groupBox3.Controls.Add(this.UseFood);
             this.groupBox3.Controls.Add(this.Backward);
             this.groupBox3.Controls.Add(this.PauseKey);
@@ -1038,6 +1041,15 @@
             this.label1.TabIndex = 170;
             this.label1.Text = "Poison Lethal";
             // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(6, 253);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(137, 13);
+            this.label11.TabIndex = 168;
+            this.label11.Text = "Search Enemy Interval (Ms)";
+            // 
             // AutoAoE
             // 
             this.AutoAoE.AutoSize = true;
@@ -1048,6 +1060,24 @@
             this.AutoAoE.Text = "Start AoE Rotation on Number Unit";
             this.AutoAoE.UseVisualStyleBackColor = true;
             this.AutoAoE.CheckedChanged += new System.EventHandler(this.AutoAoE_CheckedChanged);
+            // 
+            // SearchInterval
+            // 
+            this.SearchInterval.Increment = new decimal(new int[] {
+            100,
+            0,
+            0,
+            0});
+            this.SearchInterval.Location = new System.Drawing.Point(188, 251);
+            this.SearchInterval.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+            this.SearchInterval.Name = "SearchInterval";
+            this.SearchInterval.Size = new System.Drawing.Size(50, 20);
+            this.SearchInterval.TabIndex = 167;
+            this.SearchInterval.ValueChanged += new System.EventHandler(this.SearchInterval_ValueChanged);
             // 
             // UseFood
             // 
@@ -1590,7 +1620,6 @@
             // InterruptAll
             // 
             this.InterruptAll.AutoSize = true;
-            this.InterruptAll.Enabled = false;
             this.InterruptAll.Location = new System.Drawing.Point(130, 20);
             this.InterruptAll.Name = "InterruptAll";
             this.InterruptAll.Size = new System.Drawing.Size(37, 17);
@@ -1602,7 +1631,6 @@
             // DeadlyThrowInterrupt
             // 
             this.DeadlyThrowInterrupt.AutoSize = true;
-            this.DeadlyThrowInterrupt.Enabled = false;
             this.DeadlyThrowInterrupt.Location = new System.Drawing.Point(6, 42);
             this.DeadlyThrowInterrupt.Name = "DeadlyThrowInterrupt";
             this.DeadlyThrowInterrupt.Size = new System.Drawing.Size(177, 17);
@@ -1613,7 +1641,6 @@
             // 
             // DeadlyThrowInterruptTimeLeft
             // 
-            this.DeadlyThrowInterruptTimeLeft.Enabled = false;
             this.DeadlyThrowInterruptTimeLeft.Increment = new decimal(new int[] {
             100,
             0,
@@ -1633,7 +1660,6 @@
             // CheapShotInterrupt
             // 
             this.CheapShotInterrupt.AutoSize = true;
-            this.CheapShotInterrupt.Enabled = false;
             this.CheapShotInterrupt.Location = new System.Drawing.Point(6, 68);
             this.CheapShotInterrupt.Name = "CheapShotInterrupt";
             this.CheapShotInterrupt.Size = new System.Drawing.Size(144, 17);
@@ -1644,7 +1670,6 @@
             // 
             // CheapShotInterruptTimeLeft
             // 
-            this.CheapShotInterruptTimeLeft.Enabled = false;
             this.CheapShotInterruptTimeLeft.Increment = new decimal(new int[] {
             100,
             0,
@@ -1664,7 +1689,6 @@
             // KidneyShotInterrupt
             // 
             this.KidneyShotInterrupt.AutoSize = true;
-            this.KidneyShotInterrupt.Enabled = false;
             this.KidneyShotInterrupt.Location = new System.Drawing.Point(6, 146);
             this.KidneyShotInterrupt.Name = "KidneyShotInterrupt";
             this.KidneyShotInterrupt.Size = new System.Drawing.Size(145, 17);
@@ -1675,7 +1699,6 @@
             // 
             // KidneyShotInterruptTimeLeft
             // 
-            this.KidneyShotInterruptTimeLeft.Enabled = false;
             this.KidneyShotInterruptTimeLeft.Increment = new decimal(new int[] {
             100,
             0,
@@ -1695,7 +1718,6 @@
             // Gouge
             // 
             this.Gouge.AutoSize = true;
-            this.Gouge.Enabled = false;
             this.Gouge.Location = new System.Drawing.Point(6, 94);
             this.Gouge.Name = "Gouge";
             this.Gouge.Size = new System.Drawing.Size(120, 17);
@@ -1706,7 +1728,6 @@
             // 
             // GougeTimeLeft
             // 
-            this.GougeTimeLeft.Enabled = false;
             this.GougeTimeLeft.Increment = new decimal(new int[] {
             100,
             0,
@@ -1755,7 +1776,6 @@
             // InterruptFocus
             // 
             this.InterruptFocus.AutoSize = true;
-            this.InterruptFocus.Enabled = false;
             this.InterruptFocus.Location = new System.Drawing.Point(69, 19);
             this.InterruptFocus.Name = "InterruptFocus";
             this.InterruptFocus.Size = new System.Drawing.Size(55, 17);
@@ -1855,7 +1875,6 @@
             // ShivEnrage
             // 
             this.ShivEnrage.AutoSize = true;
-            this.ShivEnrage.Enabled = false;
             this.ShivEnrage.Location = new System.Drawing.Point(6, 19);
             this.ShivEnrage.Name = "ShivEnrage";
             this.ShivEnrage.Size = new System.Drawing.Size(127, 17);
@@ -1935,7 +1954,6 @@
             // ShivCripplingPoison
             // 
             this.ShivCripplingPoison.AutoSize = true;
-            this.ShivCripplingPoison.Enabled = false;
             this.ShivCripplingPoison.Location = new System.Drawing.Point(6, 42);
             this.ShivCripplingPoison.Name = "ShivCripplingPoison";
             this.ShivCripplingPoison.Size = new System.Drawing.Size(232, 17);
@@ -2037,7 +2055,6 @@
             // ShivParalystic
             // 
             this.ShivParalystic.AutoSize = true;
-            this.ShivParalystic.Enabled = false;
             this.ShivParalystic.Location = new System.Drawing.Point(6, 111);
             this.ShivParalystic.Name = "ShivParalystic";
             this.ShivParalystic.Size = new System.Drawing.Size(125, 17);
@@ -2072,7 +2089,6 @@
             // ShivMindNumbing
             // 
             this.ShivMindNumbing.AutoSize = true;
-            this.ShivMindNumbing.Enabled = false;
             this.ShivMindNumbing.Location = new System.Drawing.Point(6, 65);
             this.ShivMindNumbing.Name = "ShivMindNumbing";
             this.ShivMindNumbing.Size = new System.Drawing.Size(200, 17);
@@ -2171,7 +2187,6 @@
             // GougeOffensiveCooldown
             // 
             this.GougeOffensiveCooldown.AutoSize = true;
-            this.GougeOffensiveCooldown.Enabled = false;
             this.GougeOffensiveCooldown.Location = new System.Drawing.Point(6, 111);
             this.GougeOffensiveCooldown.Name = "GougeOffensiveCooldown";
             this.GougeOffensiveCooldown.Size = new System.Drawing.Size(221, 17);
@@ -2182,7 +2197,6 @@
             // 
             // GougeHelpFriendHP
             // 
-            this.GougeHelpFriendHP.Enabled = false;
             this.GougeHelpFriendHP.Increment = new decimal(new int[] {
             5,
             0,
@@ -2197,7 +2211,6 @@
             // GougePet
             // 
             this.GougePet.AutoSize = true;
-            this.GougePet.Enabled = false;
             this.GougePet.Location = new System.Drawing.Point(6, 65);
             this.GougePet.Name = "GougePet";
             this.GougePet.Size = new System.Drawing.Size(182, 17);
@@ -2209,7 +2222,6 @@
             // GougeHelpFriend
             // 
             this.GougeHelpFriend.AutoSize = true;
-            this.GougeHelpFriend.Enabled = false;
             this.GougeHelpFriend.Location = new System.Drawing.Point(6, 88);
             this.GougeHelpFriend.Name = "GougeHelpFriend";
             this.GougeHelpFriend.Size = new System.Drawing.Size(165, 17);
@@ -2221,7 +2233,6 @@
             // ShadowWalk
             // 
             this.ShadowWalk.AutoSize = true;
-            this.ShadowWalk.Enabled = false;
             this.ShadowWalk.Location = new System.Drawing.Point(6, 323);
             this.ShadowWalk.Name = "ShadowWalk";
             this.ShadowWalk.Size = new System.Drawing.Size(93, 17);
@@ -2273,7 +2284,6 @@
             // SapAny
             // 
             this.SapAny.AutoSize = true;
-            this.SapAny.Enabled = false;
             this.SapAny.Location = new System.Drawing.Point(169, 277);
             this.SapAny.Name = "SapAny";
             this.SapAny.Size = new System.Drawing.Size(66, 17);
@@ -2308,7 +2318,6 @@
             // SapRogueDruid
             // 
             this.SapRogueDruid.AutoSize = true;
-            this.SapRogueDruid.Enabled = false;
             this.SapRogueDruid.Location = new System.Drawing.Point(76, 277);
             this.SapRogueDruid.Name = "SapRogueDruid";
             this.SapRogueDruid.Size = new System.Drawing.Size(86, 17);
@@ -2363,7 +2372,6 @@
             // SapFocus
             // 
             this.SapFocus.AutoSize = true;
-            this.SapFocus.Enabled = false;
             this.SapFocus.Location = new System.Drawing.Point(170, 255);
             this.SapFocus.Name = "SapFocus";
             this.SapFocus.Size = new System.Drawing.Size(55, 17);
@@ -2375,7 +2383,6 @@
             // SapTarget
             // 
             this.SapTarget.AutoSize = true;
-            this.SapTarget.Enabled = false;
             this.SapTarget.Location = new System.Drawing.Point(76, 254);
             this.SapTarget.Name = "SapTarget";
             this.SapTarget.Size = new System.Drawing.Size(57, 17);
@@ -2511,7 +2518,6 @@
             // CloakofShadowsRoot
             // 
             this.CloakofShadowsRoot.AutoSize = true;
-            this.CloakofShadowsRoot.Enabled = false;
             this.CloakofShadowsRoot.Location = new System.Drawing.Point(6, 160);
             this.CloakofShadowsRoot.Name = "CloakofShadowsRoot";
             this.CloakofShadowsRoot.Size = new System.Drawing.Size(176, 17);
@@ -2523,7 +2529,6 @@
             // ExposeArmor
             // 
             this.ExposeArmor.AutoSize = true;
-            this.ExposeArmor.Enabled = false;
             this.ExposeArmor.Location = new System.Drawing.Point(6, 327);
             this.ExposeArmor.Name = "ExposeArmor";
             this.ExposeArmor.Size = new System.Drawing.Size(91, 17);
@@ -2546,7 +2551,6 @@
             // DisarmTrap
             // 
             this.DisarmTrap.AutoSize = true;
-            this.DisarmTrap.Enabled = false;
             this.DisarmTrap.Location = new System.Drawing.Point(6, 281);
             this.DisarmTrap.Name = "DisarmTrap";
             this.DisarmTrap.Size = new System.Drawing.Size(83, 17);
@@ -2587,7 +2591,6 @@
             // DistmantleCooldown
             // 
             this.DistmantleCooldown.AutoSize = true;
-            this.DistmantleCooldown.Enabled = false;
             this.DistmantleCooldown.Location = new System.Drawing.Point(6, 258);
             this.DistmantleCooldown.Name = "DistmantleCooldown";
             this.DistmantleCooldown.Size = new System.Drawing.Size(235, 17);
@@ -2738,7 +2741,6 @@
             // AttackASAP
             // 
             this.AttackASAP.AutoSize = true;
-            this.AttackASAP.Enabled = false;
             this.AttackASAP.Location = new System.Drawing.Point(6, 19);
             this.AttackASAP.Name = "AttackASAP";
             this.AttackASAP.Size = new System.Drawing.Size(202, 17);
@@ -3035,7 +3037,6 @@
             // DismantleTarget
             // 
             this.DismantleTarget.AutoSize = true;
-            this.DismantleTarget.Enabled = false;
             this.DismantleTarget.Location = new System.Drawing.Point(6, 149);
             this.DismantleTarget.Name = "DismantleTarget";
             this.DismantleTarget.Size = new System.Drawing.Size(162, 17);
@@ -3046,7 +3047,6 @@
             // 
             // DismantleTargetUnit
             // 
-            this.DismantleTargetUnit.Enabled = false;
             this.DismantleTargetUnit.Location = new System.Drawing.Point(196, 147);
             this.DismantleTargetUnit.Maximum = new decimal(new int[] {
             10,
@@ -3061,7 +3061,6 @@
             // Dismantle
             // 
             this.Dismantle.AutoSize = true;
-            this.Dismantle.Enabled = false;
             this.Dismantle.Location = new System.Drawing.Point(6, 123);
             this.Dismantle.Name = "Dismantle";
             this.Dismantle.Size = new System.Drawing.Size(130, 17);
@@ -3072,7 +3071,6 @@
             // 
             // DismantleHP
             // 
-            this.DismantleHP.Enabled = false;
             this.DismantleHP.Increment = new decimal(new int[] {
             5,
             0,
@@ -3188,7 +3186,6 @@
             // 
             // SaveSetting
             // 
-            this.SaveSetting.Enabled = false;
             this.SaveSetting.Location = new System.Drawing.Point(98, 427);
             this.SaveSetting.Name = "SaveSetting";
             this.SaveSetting.Size = new System.Drawing.Size(80, 23);
@@ -3199,7 +3196,6 @@
             // 
             // LoadSetting
             // 
-            this.LoadSetting.Enabled = false;
             this.LoadSetting.Location = new System.Drawing.Point(12, 427);
             this.LoadSetting.Name = "LoadSetting";
             this.LoadSetting.Size = new System.Drawing.Size(80, 23);
@@ -3257,6 +3253,7 @@
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.FanofKnivesUnit)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SearchInterval)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.UnittoStartAoE)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.UseFoodHP)).EndInit();
             this.groupBox1.ResumeLayout(false);
@@ -3375,6 +3372,8 @@
         private System.Windows.Forms.TabPage tabPage5;
         private System.Windows.Forms.GroupBox groupBox8;
         private System.Windows.Forms.CheckBox AutoAoE;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.NumericUpDown SearchInterval;
         private System.Windows.Forms.CheckBox InterruptFocus;
         private System.Windows.Forms.CheckBox InterruptTarget;
         private System.Windows.Forms.CheckBox AttackASAP;

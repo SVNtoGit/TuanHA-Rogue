@@ -55,7 +55,7 @@ namespace TuanHARogue
 
         public override string Name
         {
-            get { return "TuanHA Rogue [Public Release]"; }
+            get { return "TuanHA Rogue [Open Beta]"; }
         }
 
         public override Composite RestBehavior
@@ -197,6 +197,17 @@ namespace TuanHARogue
             return new Decorator(
                 ret =>
                 !Me.IsValid ||
+                InArena &&
+                !Me.Name.Contains("Nofe") &&
+                !Me.Name.Contains("Nire") &&
+                !Me.Name.Contains("Мунжи") &&
+                !Me.Name.Contains("Sodo") &&
+                !Me.Name.Contains("Isbe") &&
+                !Me.Name.Contains("Dustb") &&
+                !Me.Name.Contains("Elán") &&
+                !Me.Name.Contains("Derpi") &&
+                !Me.Name.Contains("Gg") &&
+                !Me.Name.Contains("Darks") ||
                 !StyxWoW.IsInWorld ||
                 !Me.IsAlive ||
                 //!THSettings.Instance.AttackOOC &&
@@ -242,6 +253,10 @@ namespace TuanHARogue
             {
                 ObjectManager.Update();
                 KickVoid();
+                CheapShotInterruptVoid();
+                GougeVoid();
+                KidneyShotInterruptVoid();
+                DeadlyThrowVoid();
                 PendingSpellRemove();
                 //StealthVoid();
 
@@ -532,7 +547,6 @@ namespace TuanHARogue
                         return RunStatus.Failure;
                     }
                     ),
-                UpdateEventHandlerComp(),
                 SetAutoAttack(),
                 UseRacial(),
                 UseTrinket(),
@@ -553,9 +567,9 @@ namespace TuanHARogue
                     UseRotation == "RogueSubtlety",
                     SubtletyRotation()
                     ),
-                RestRotation()
-                )
-                ;
+                RestRotation(),
+                UpdateEventHandlerComp()
+                );
         }
 
         #endregion

@@ -17,17 +17,17 @@ namespace TuanHARogue
         {
             if (
                 File.Exists(Utilities.AssemblyDirectory +
-                            @"\Routines\TuanHARogue\TuanHA-Rogue-Picture.jpg"))
+                            @"\Routines\TuanHARogueOpenBeta\TuanHA-Rogue-Picture.jpg"))
             {
                 pictureBox1.ImageLocation = Utilities.AssemblyDirectory +
-                                            @"\Routines\TuanHARogue\TuanHA-Rogue-Picture.jpg";
+                                            @"\Routines\TuanHARogueOpenBeta\TuanHA-Rogue-Picture.jpg";
             }
 
             if (File.Exists(Utilities.AssemblyDirectory +
-                            @"\Routines\TuanHARogue\SpecialThanks.rtf"))
+                            @"\Routines\TuanHARogueOpenBeta\SpecialThanks.rtf"))
             {
                 richTextBox1.LoadFile(Utilities.AssemblyDirectory +
-                                      @"\Routines\TuanHARogue\SpecialThanks.rtf");
+                                      @"\Routines\TuanHARogueOpenBeta\SpecialThanks.rtf");
             }
 
             AdrenalineRushCD.Checked = THSettings.Instance.AdrenalineRushCD;
@@ -134,6 +134,7 @@ namespace TuanHARogue
             SapFocus.Checked = THSettings.Instance.SapFocus;
             SapRogueDruid.Checked = THSettings.Instance.SapRogueDruid;
             SapAny.Checked = THSettings.Instance.SapAny;
+            SearchInterval.Value = THSettings.Instance.SearchInterval;
             ShadowDanceCD.Checked = THSettings.Instance.ShadowDanceCD;
             ShadowDance.Checked = THSettings.Instance.ShadowDance;
             ShadowDanceEnergy.Value = THSettings.Instance.ShadowDanceEnergy;
@@ -234,11 +235,11 @@ namespace TuanHARogue
             Logging.Write("----------------------------------");
 
             if (File.Exists(Utilities.AssemblyDirectory +
-                            @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Dungeon.xml"))
+                            @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Dungeon.xml"))
             {
                 Logging.Write("----------------------------------");
                 THSettings.Instance.LoadFromXML(XElement.Load(Utilities.AssemblyDirectory +
-                                                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Dungeon.xml"));
+                                                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Dungeon.xml"));
                 Logging.Write("Load TuanHA Rogue Defaut Dungeon Settings from a file complete");
                 Logging.Write("----------------------------------");
                 THDKForm_Load(null, null);
@@ -247,7 +248,7 @@ namespace TuanHARogue
             {
                 Logging.Write("----------------------------------");
                 Logging.Write("File not exists: " + Utilities.AssemblyDirectory +
-                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Dungeon.xml");
+                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Dungeon.xml");
                 Logging.Write("Load TuanHA Rogue Defaut AFK Dungeon from a file fail.");
                 Logging.Write("----------------------------------");
             }
@@ -267,11 +268,11 @@ namespace TuanHARogue
             Logging.Write("----------------------------------");
 
             if (File.Exists(Utilities.AssemblyDirectory +
-                            @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Raid.xml"))
+                            @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Raid.xml"))
             {
                 Logging.Write("----------------------------------");
                 THSettings.Instance.LoadFromXML(XElement.Load(Utilities.AssemblyDirectory +
-                                                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Raid.xml"));
+                                                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Raid.xml"));
                 Logging.Write("Load TuanHA Rogue Defaut Raid Settings from a file complete");
                 Logging.Write("----------------------------------");
                 THDKForm_Load(null, null);
@@ -280,7 +281,7 @@ namespace TuanHARogue
             {
                 Logging.Write("----------------------------------");
                 Logging.Write("File not exists: " + Utilities.AssemblyDirectory +
-                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Raid.xml");
+                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Raid.xml");
                 Logging.Write("Load TuanHA Rogue Defaut AFK Raid from a file fail.");
                 Logging.Write("----------------------------------");
             }
@@ -300,11 +301,11 @@ namespace TuanHARogue
             Logging.Write("----------------------------------");
 
             if (File.Exists(Utilities.AssemblyDirectory +
-                            @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut PvP.xml"))
+                            @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut PvP.xml"))
             {
                 Logging.Write("----------------------------------");
                 THSettings.Instance.LoadFromXML(XElement.Load(Utilities.AssemblyDirectory +
-                                                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut PvP.xml"));
+                                                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut PvP.xml"));
                 Logging.Write("Load TuanHA Rogue Defaut PvP Settings from a file complete");
                 Logging.Write("----------------------------------");
                 THDKForm_Load(null, null);
@@ -313,7 +314,7 @@ namespace TuanHARogue
             {
                 Logging.Write("----------------------------------");
                 Logging.Write("File not exists: " + Utilities.AssemblyDirectory +
-                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut PvP.xml");
+                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut PvP.xml");
                 Logging.Write("Load TuanHA Rogue Defaut AFK PvP from a file fail.");
                 Logging.Write("----------------------------------");
             }
@@ -332,11 +333,11 @@ namespace TuanHARogue
             Logging.Write("----------------------------------");
 
             if (File.Exists(Utilities.AssemblyDirectory +
-                            @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Arena.xml"))
+                            @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Arena.xml"))
             {
                 Logging.Write("----------------------------------");
                 THSettings.Instance.LoadFromXML(XElement.Load(Utilities.AssemblyDirectory +
-                                                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Arena.xml"));
+                                                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Arena.xml"));
                 Logging.Write("Load TuanHA Rogue Defaut Arena Settings from a file complete");
                 Logging.Write("----------------------------------");
                 THDKForm_Load(null, null);
@@ -345,7 +346,7 @@ namespace TuanHARogue
             {
                 Logging.Write("----------------------------------");
                 Logging.Write("File not exists: " + Utilities.AssemblyDirectory +
-                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut Arena.xml");
+                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut Arena.xml");
                 Logging.Write("Load TuanHA Rogue Defaut AFK Arena from a file fail.");
                 Logging.Write("----------------------------------");
             }
@@ -362,11 +363,11 @@ namespace TuanHARogue
             Logging.Write("----------------------------------");
 
             if (File.Exists(Utilities.AssemblyDirectory +
-                            @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut AFK.xml"))
+                            @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut AFK.xml"))
             {
                 Logging.Write("----------------------------------");
                 THSettings.Instance.LoadFromXML(XElement.Load(Utilities.AssemblyDirectory +
-                                                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut AFK.xml"));
+                                                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut AFK.xml"));
                 Logging.Write("Load TuanHA Rogue Defaut AFK Settings from a file complete");
                 Logging.Write("----------------------------------");
                 THDKForm_Load(null, null);
@@ -375,7 +376,7 @@ namespace TuanHARogue
             {
                 Logging.Write("----------------------------------");
                 Logging.Write("File not exists: " + Utilities.AssemblyDirectory +
-                              @"\Routines\TuanHARogue\Preset\TuanHA Rogue Defaut AFK.xml");
+                              @"\Routines\TuanHARogueOpenBeta\Preset\TuanHA Rogue Defaut AFK.xml");
                 Logging.Write("Load TuanHA Rogue Defaut AFK Settings from a file fail.");
                 Logging.Write("----------------------------------");
             }
@@ -387,7 +388,7 @@ namespace TuanHARogue
             saveFileDialog.Filter = "Setting File|*.xml";
             saveFileDialog.Title = "Save Setting to a File";
             saveFileDialog.InitialDirectory = Utilities.AssemblyDirectory +
-                                              @"\Routines\TuanHARogue\User Settings\";
+                                              @"\Routines\TuanHARogueOpenBeta\User Settings\";
             saveFileDialog.DefaultExt = "xml";
             saveFileDialog.FileName = "TuanHA Rogue " + Classname.GetCurrentSpec();
 
@@ -420,7 +421,7 @@ namespace TuanHARogue
                 {
                     Filter = "Setting File|*.xml",
                     Title = "Load Setting from a File",
-                    InitialDirectory = Utilities.AssemblyDirectory + @"\Routines\TuanHARogue\User Settings\"
+                    InitialDirectory = Utilities.AssemblyDirectory + @"\Routines\TuanHARogueOpenBeta\User Settings\"
                 };
             openFileDialog.ShowDialog();
 
@@ -631,16 +632,24 @@ namespace TuanHARogue
         {
             THSettings.Instance.AutoMove = AutoMove.Checked;
         }
-        
+
+
         private void AutoRacial_CheckedChanged(object sender, EventArgs e)
         {
             THSettings.Instance.AutoRacial = AutoRacial.Checked;
         }
-        
+
+
         private void AutoAoE_CheckedChanged(object sender, EventArgs e)
         {
             THSettings.Instance.AutoAoE = AutoAoE.Checked;
         }
+
+        private void SearchInterval_ValueChanged(object sender, EventArgs e)
+        {
+            THSettings.Instance.SearchInterval = (int) SearchInterval.Value;
+        }
+
 
         private void InterruptTarget_CheckedChanged(object sender, EventArgs e)
         {

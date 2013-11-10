@@ -7,29 +7,30 @@
   <AutoAttack>True</AutoAttack>
   <AutoFace>True</AutoFace>
   <AutoMove>False</AutoMove>
-  <AutoRacial>True</AutoRacial>
+  <AutoRacial>False</AutoRacial>
   <AutoTarget>False</AutoTarget>
   <AttackASAP>True</AttackASAP>
   <AttackOOC>False</AttackOOC>
   <Ambush>True</Ambush>
-  <Backstab>True</Backstab>
-  <Backward>19</Backward>
+  <Backstab>False</Backstab>
+  <Backward>4</Backward>
   <BladeFlurry>True</BladeFlurry>
-  <BurstKey>6</BurstKey>
+  <BurstKey>7</BurstKey>
   <BurstHP>70</BurstHP>
   <BurstofSpeed>True</BurstofSpeed>
-  <BurstofSpeedDistance>8</BurstofSpeedDistance>
+  <BurstofSpeedDistance>15</BurstofSpeedDistance>
   <BurstofSpeedEnergy>True</BurstofSpeedEnergy>
-  <BurstofSpeedEnergyNumber>80</BurstofSpeedEnergyNumber>
+  <BurstofSpeedEnergyNumber>130</BurstofSpeedEnergyNumber>
   <BurstofSpeedRenew>500</BurstofSpeedRenew>
+  <CheapShotStunLevel>2</CheapShotStunLevel>
   <CheapShot>True</CheapShot>
   <CheapShotInterrupt>True</CheapShotInterrupt>
-  <CheapShotInterruptTimeLeft>1500</CheapShotInterruptTimeLeft>
+  <CheapShotInterruptTimeLeft>2000</CheapShotInterruptTimeLeft>
   <CloakofShadows>True</CloakofShadows>
   <CloakofShadowsHP>60</CloakofShadowsHP>
   <CloakofShadowsTarget>True</CloakofShadowsTarget>
   <CloakofShadowsTargetUnit>3</CloakofShadowsTargetUnit>
-  <CloakofShadowsRoot>False</CloakofShadowsRoot>
+  <CloakofShadowsRoot>True</CloakofShadowsRoot>
   <CombatReadiness>True</CombatReadiness>
   <CombatReadinessHP>60</CombatReadinessHP>
   <CombatReadinessTarget>True</CombatReadinessTarget>
@@ -39,7 +40,7 @@
   <CrimsonTempestUnit>3</CrimsonTempestUnit>
   <DeadlyThrow>True</DeadlyThrow>
   <DeadlyThrowInterrupt>True</DeadlyThrowInterrupt>
-  <DeadlyThrowInterruptTimeLeft>1500</DeadlyThrowInterruptTimeLeft>
+  <DeadlyThrowInterruptTimeLeft>2000</DeadlyThrowInterruptTimeLeft>
   <DeadlyThrowSlow>True</DeadlyThrowSlow>
   <DeadlyThrowSlowDistance>15</DeadlyThrowSlowDistance>
   <DeadlyThrowFinish>True</DeadlyThrowFinish>
@@ -64,17 +65,17 @@
   <EviscerateCP>5</EviscerateCP>
   <Envenom>True</Envenom>
   <EnvenomCP>5</EnvenomCP>
-  <ExposeArmor>False</ExposeArmor>
+  <ExposeArmor>True</ExposeArmor>
   <FanofKnives>False</FanofKnives>
   <FanofKnivesUnit>7</FanofKnivesUnit>
-  <Forward>23</Forward>
+  <Forward>5</Forward>
   <Feint>True</Feint>
   <FeintHP>80</FeintHP>
   <FeintTarget>True</FeintTarget>
   <FeintTargetUnit>3</FeintTargetUnit>
   <Garrote>True</Garrote>
   <Gouge>True</Gouge>
-  <GougeTimeLeft>1500</GougeTimeLeft>
+  <GougeTimeLeft>2000</GougeTimeLeft>
   <GougePet>True</GougePet>
   <GougeHelpFriend>True</GougeHelpFriend>
   <GougeHelpFriendHP>40</GougeHelpFriendHP>
@@ -88,9 +89,10 @@
   <Kick>True</Kick>
   <KickTimeLeft>1000</KickTimeLeft>
   <KidneyShot>True</KidneyShot>
+  <KidneyShotStunLevel>2</KidneyShotStunLevel>
   <KidneyShotCP>5</KidneyShotCP>
   <KidneyShotInterrupt>True</KidneyShotInterrupt>
-  <KidneyShotInterruptTimeLeft>1500</KidneyShotInterruptTimeLeft>
+  <KidneyShotInterruptTimeLeft>2000</KidneyShotInterruptTimeLeft>
   <KidneyShotStunLeft>500</KidneyShotStunLeft>
   <KillingSpree>True</KillingSpree>
   <KillingSpreeCD>False</KillingSpreeCD>
@@ -108,34 +110,35 @@
   <Pause>False</Pause>
   <PickPocket>False</PickPocket>
   <PoisonLethal>1</PoisonLethal>
-  <PoisonNonLethal>2</PoisonNonLethal>
+  <PoisonNonLethal>4</PoisonNonLethal>
   <PoolEnergy>True</PoolEnergy>
   <PoolEnergyPC>50</PoolEnergyPC>
   <Premeditation>True</Premeditation>
   <Preparation>True</Preparation>
   <PriorityHeal>75</PriorityHeal>
   <ProfBuff>3</ProfBuff>
-  <ProfBuffHP>60</ProfBuffHP>
+  <ProfBuffHP>70</ProfBuffHP>
   <Recuperate>True</Recuperate>
   <RecuperateHP>90</RecuperateHP>
   <Redirect>True</Redirect>
   <RevealingStrike>True</RevealingStrike>
   <Rupture>True</Rupture>
   <RuptureCP>5</RuptureCP>
+  <SapLevel>3</SapLevel>
   <SapTarget>False</SapTarget>
-  <SapFocus>False</SapFocus>
+  <SapFocus>True</SapFocus>
   <SapRogueDruid>True</SapRogueDruid>
-  <SapAny>False</SapAny>
+  <SapAny>True</SapAny>
   <SearchInterval>500</SearchInterval>
   <ShadowBlades>True</ShadowBlades>
   <ShadowBladesCD>False</ShadowBladesCD>
   <ShadowBladesBurst>True</ShadowBladesBurst>
   <ShadowBladeSync>True</ShadowBladeSync>
   <ShadowDance>True</ShadowDance>
-  <ShadowDanceEnergy>90</ShadowDanceEnergy>
+  <ShadowDanceEnergy>100</ShadowDanceEnergy>
   <ShadowDanceCD>False</ShadowDanceCD>
   <ShadowDanceBurst>True</ShadowDanceBurst>
-  <ShadowDanceSap>True</ShadowDanceSap>
+  <ShadowDanceSap>False</ShadowDanceSap>
   <Shadowstep>True</Shadowstep>
   <ShadowstepDistance>15</ShadowstepDistance>
   <ShadowWalk>True</ShadowWalk>
@@ -160,9 +163,9 @@
   <SprintDistance>10</SprintDistance>
   <SprintPre>False</SprintPre>
   <Stealth>True</Stealth>
-  <StealthForce>True</StealthForce>
-  <StrafleLeft>17</StrafleLeft>
-  <StrafleRight>5</StrafleRight>
+  <StealthForce>False</StealthForce>
+  <StrafleLeft>19</StrafleLeft>
+  <StrafleRight>6</StrafleRight>
   <Throw>True</Throw>
   <TricksoftheTrade>True</TricksoftheTrade>
   <TricksoftheTradeFocus>False</TricksoftheTradeFocus>
@@ -170,9 +173,9 @@
   <Trinket1>3</Trinket1>
   <Trinket1HP>70</Trinket1HP>
   <Trinket2>3</Trinket2>
-  <Trinket2HP>60</Trinket2HP>
-  <TurnRight>4</TurnRight>
-  <TurnLeft>1</TurnLeft>
+  <Trinket2HP>70</Trinket2HP>
+  <TurnRight>0</TurnRight>
+  <TurnLeft>0</TurnLeft>
   <UnittoStartAoE>3</UnittoStartAoE>
   <UrgentHeal>40</UrgentHeal>
   <UseFood>False</UseFood>
@@ -182,8 +185,8 @@
   <VanishPre>True</VanishPre>
   <VanishHP>25</VanishHP>
   <VanishCD>False</VanishCD>
-  <VanishBurst>True</VanishBurst>
-  <VanishSap>True</VanishSap>
+  <VanishBurst>False</VanishBurst>
+  <VanishSap>False</VanishSap>
   <Vendetta>True</Vendetta>
   <VendettaCD>False</VendettaCD>
   <VendettaBurst>True</VendettaBurst>

@@ -82,9 +82,9 @@
   <HealthStone>True</HealthStone>
   <HealthStoneHP>40</HealthStoneHP>
   <Hemorrhage>True</Hemorrhage>
-  <InterruptAll>True</InterruptAll>
+  <InterruptAll>False</InterruptAll>
   <InterruptTarget>True</InterruptTarget>
-  <InterruptFocus>True</InterruptFocus>
+  <InterruptFocus>False</InterruptFocus>
   <Kick>True</Kick>
   <KickTimeLeft>1500</KickTimeLeft>
   <KidneyShot>False</KidneyShot>
